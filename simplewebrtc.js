@@ -315,10 +315,12 @@ WebRTC.prototype.getLocalVideoContainer = function () {
     if (el && el.tagName === 'VIDEO') {
         return el;
     } else {
-        var video = document.createElement('video');
-        video.setAttribute('width', LOCAL_VIDEO_DEFAULT_WIDTH);
-        video.setAttribute('height', LOCAL_VIDEO_DEFAULT_HEIGHT);
+        var video = document.createElement/*('div');*/('video');
+        
+        video.setAttribute('class', 'local_video');
+        
         el.appendChild(video);
+
         return video;
     }
 };
@@ -486,12 +488,15 @@ Conversation.prototype.answer = function () {
 
 Conversation.prototype.handleRemoteStreamAdded = function (event) {
     var stream = this.stream = event.stream,
-        el = document.createElement('video'),
+        el = document.createElement/*('div')*/('video'),
         container = this.parent.getRemoteVideoContainer();
+    
     el.id = this.id;
-    el.setAttribute('width', REMOTE_VIDEO_DEFAULT_WIDTH);
-    el.setAttribute('height', REMOTE_VIDEO_DEFAULT_HEIGHT);    
+    
+    el.setAttribute('class', 'remote_video'); 
+
     attachMediaStream(el, stream);
+    
     if (container) container.appendChild(el);
     this.emit('videoAdded', el);
 };

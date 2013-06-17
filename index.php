@@ -17,98 +17,87 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <style>
-            *{
-                margin: 0;
-                padding: 0;
-            }
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
 
-            #top_stripe {
-                margin: 10px;
-            }
-            
-            #localVideo {
-                margin: 10px;
-                width: 150px;
-                height: 100px;
-                border: 1px solid red;
-            }
+        .clear {
+            clear: both;
+        } 
 
-            #remoteVideos {
-                margin: 10px;
-                width: 50%;
-                height: 200px;
-                border: 1px solid red;
-                float: left;
-            }
-            
-            #new_room {
-                margin: 10px 0;
-            }
-            
-            #new_room > a {
-                margin-left: 10px;
-            }
-            
-            #cstatus {
-                margin: 10px;
-            }
-            
-            #chat {
-                margin: 10px;
-            }
-            
-            #chat > * {
-                margin-bottom: 10px;
-            }
-            
-            #outgoingChatMessage {
-                display:block;
-                width: 320px;
-            }
+        a {
+            text-decoration: none;
+            color: #4096EE; 
+            cursor: pointer;
+        }
+        
+        a:hover {
+            color: #356AA0;
+        }
 
-            #incomingChatMessages {
-                width:320px;
-                height:320px;
-            }
+        #top_stripe {
+            display: block;
+            width: 99%;
+            max-width: 36em;
+            border: 0.1em solid #C3D9FF;
+            float: left;           
+        }
+        
+        #top_stripe > *{
+            float: left;
+            margin: 0 0.5em;
+        }
+        
+        #remoteVideos {
+            display: block;
+            width: 99%;
+            max-width: 36em;
+            border: 0.1em solid #C3D9FF;
+            float: left;
+            margin: 0.5em 0;
+        }
+        
+        .remote_video, .local_video {
+            width: 11.5em;           
+            height: 8.8em;
+            background-color: #CCC;
+            border: 0.1em solid #C3D9FF;
+            margin: 0.1em; 
+            float:left;
+        }
+        
+        /*
+        .local_video {
+            width: 5.75em;
+            height: 5em;
+            background-color: #CCC;
+            border: 0.1em solid #C3D9FF;
+        }
+        */
+        
+        #chat {
+            display: block;
+            width: 99%;
+            max-width: 36em;
+            border: 0.1em solid #C3D9FF;
+            float: left;
+            margin: 0.5em 0;
+        }
+        
+        #chat > * {
+            float: left;
+            width: 99%;
+            margin: 0.1em;
+        }
 
-            #bottom_stripe {
-                height:400px;
-            }
-
-            #bottom_stripe > div {
-                float: left;
-                margin: 5px 20px;
-                height:385px;
-            }            
-            
-            #user_chat {
-                margin: 10px;
-            }
-            
-            #user_chat > * {
-                margin-bottom: 10px;
-            }
-            
-            #outgoingUserChatMessage {
-                display:block;
-                width: 320px;
-            }
-
-            #incomingUserChatMessages {
-                width:320px;
-                height:320px;
-            }  
-
-            #online_users > li > a {
-                color:grey;                
-            }
-            
-            #online_users {
-                list-style-type:none;                
-            }
-
-        </style>
+        #incomingChatMessages {
+            height: 15em;
+        }
+        
+    </style>  
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 
         <?php if(isset($_SESSION['username'])) { ?>
@@ -122,18 +111,21 @@
                 
                 USERNAME = "<?php echo $_SESSION['username']; ?>";
                 
-                ROOM_ID = "<?php echo $ROOM_ID; ?>";
-                            
-                LOCAL_VIDEO_DEFAULT_WIDTH = '150px';
-                LOCAL_VIDEO_DEFAULT_HEIGHT = '100px';
-                
-                REMOTE_VIDEO_DEFAULT_WIDTH = '300px';
-                REMOTE_VIDEO_DEFAULT_HEIGHT = '200px';
+                ROOM_ID = "<?php echo $ROOM_ID; ?>"
 
-                CHAT_TEXTAREA_MAX_ROW = 20;
+                CHAT_INPUT_WIDTH = '11em';
+                CHAT_TEXTAREA_WIDTH = '11em';
+                CHAT_TEXTAREA_HEIGHT = '11em';                
+                
+                CHAT_TEXTAREA_MAX_ROW = 20; //how many rows go into the texarea before it starts to scroll up
                 
                 var online_users = [];
-                                
+
+                var current_chat_id = null;
+                var current_chat_text;
+
+                var to_user;
+                                                                
                 format = function(date){
                     var dd=date.getDate();
 
@@ -154,7 +146,8 @@
                                                 
                 var webrtc = new WebRTC({
                     // the id of (or actual element) to hold "our" video
-                    localVideoEl: 'localVideo',
+                    //localVideoEl: 'localVideo',
+                    localVideoEl: 'remoteVideos',
 
                     // the id of or actual element that will hold remote videos
                     remoteVideosEl: 'remoteVideos',
@@ -165,13 +158,13 @@
                 
                 // we have to wait until it's ready
                 webrtc.on('readyToCall', function () {
-                    $('#cstatus').text('Room chat');
-                    ////$('#cstatus').hide();
+                    current_chat = 'Room Chat';
+                    //$('#cstatus').text('> Room chat');
+                    changeChat('cstatus', 'Room chat');                    
+                    $('#cstatus').click(showRoomChat);
                     $('#chat').show();
                     webrtc.joinRoom(ROOM_ID);
                 });
-
-                var to_user;
                                   
                 $(document).keypress(function(event) {
                     
@@ -215,7 +208,7 @@
                 });
                 
                 function showRoomChat(){
-
+                    
                     var pch_i = document.getElementById('pch_i-' + to_user);
                     var pch_t = document.getElementById('pch_t-' + to_user);
                     
@@ -223,11 +216,20 @@
                         pch_i.style.display = 'none';
                         pch_t.style.display = 'none';
                     }
-
-                    $("#cstatus").text("Room chat");
+                                        
+                    changeChat('cstatus', 'Room chat');
+                    
+                    //$("#cstatus").text("> Room chat");
 
                     document.getElementById('outgoingChatMessage').style.display = 'block';
                     document.getElementById('incomingChatMessages').style.display = 'block';
+                }
+                    
+                function changeChat(new_chat_id, new_chat_text) {
+                    if(current_chat_id !== null) $('#'+current_chat_id).text(current_chat_text);
+                    current_chat_id = new_chat_id;
+                    current_chat_text = new_chat_text; 
+                    $('#'+current_chat_id).text('> ' + current_chat_text);                                       
                 }
                 
                 function showUserChat(new_user){
@@ -247,7 +249,9 @@
                                             
                     to_user = new_user;
                                             
-                    $("#cstatus").text("Private chat with " + to_user);
+                    //$("#cstatus").text("Private chat with " + to_user);
+                    
+                    changeChat('ou_' + to_user, to_user)
                     
                     pch_i = document.getElementById('pch_i-' + to_user);
                     pch_t = document.getElementById('pch_t-' + to_user);
@@ -265,13 +269,13 @@
                         pch_i.setAttribute('type', 'text');
                         pch_i.setAttribute('id', "pch_i-" + to_user);
                         pch_i.style.display = 'block';
-                        pch_i.style.width = '320px';                
+                        pch_i.style.width = CHAT_INPUT_WIDTH;                
                         pch.appendChild(pch_i);
                         
                         var pch_t = document.createElement('Textarea');
                         pch_t.setAttribute('id', "pch_t-" + to_user);
-                        pch_t.style.width = '320px';
-                        pch_t.style.height = '320px';
+                        pch_t.style.width = CHAT_TEXTAREA_WIDTH;
+                        pch_t.style.height = CHAT_TEXTAREA_HEIGHT;
                         pch.appendChild(pch_t);
                     }                         
                 }
@@ -335,7 +339,7 @@
                             var ul = document.getElementById('online_users');
                             var li = document.createElement('li');
                             var a = document.createElement('a');
-                            a.setAttribute('href', '#');
+                            //a.setAttribute('href', '#');
                             a.setAttribute('id', 'ou_' + username);
                             a.setAttribute('onclick', "showUserChat('"+username+"')");
                             a.innerHTML = username;
@@ -398,50 +402,40 @@
             <a href="/google.php">Login with Google</a> |         
             <!--a href="/yahoo.php">Login with Yahoo</a-->        
         <?php } else { ?>
-            <p id="top_stripe">
-                Welcome: <?php print $_SESSION['username']; ?> | 
-                <span id="curr_room">You are in room: <?php echo $ROOM_ID; ?></span> |
+            <div id="top_stripe">
+                <span>Welcome: <?php print $_SESSION['username']; ?></span> 
+                <span id="curr_room">You are in room: <?php echo $ROOM_ID; ?></span>
+                <a id="create_room" href="#">Create room</a>
                 <a href="?logout">Logout</a>
-            </p>
+            </div>
+            <br class="clear" />
             <div id="remoteVideos"></div>
-            <br style="clear:both" />
+            <br class="clear" />
             <div id="bottom_stripe">
-                <!--div>
-                    <p id="cstatus">Connecting to chat... Please wait...</p> 
-                    <div id="chat" style="display:none">
-                        <input type="text" id="outgoingChatMessage" />
-                        <textarea id="incomingChatMessages"></textarea>
-                    </div>
-                </div-->
                 <div>
                     <div id="localVideo"></div>
                 </div>
+                <div id="chat" style="display:none">
+                    <p>Text Chat</p>
+                    <input type="text" id="outgoingChatMessage" />
+                    <textarea id="incomingChatMessages"></textarea>
+                </div>
+                <br class="clear" />
                 <div>
-                    <p id="new_room"><a id="create_room" href="#">Create room</a></p>
-                    <p><a href="#" onclick="showRoomChat()">Room chat</a></p>
-                    <p>Users</p>
+                    <p><a id="cstatus">Connecting to chat...</a></p>
+                    <p>Private Chat with User:</p>
                     <ul id="online_users">
                         <?php
                             $users = scandir('./users/');
                             foreach($users as $user) {
-                                if($user != '.' && $user != '..') {
-                                    print "<li><a href='#' id='ou_" . $user . "' onclick='showUserChat(\"$user\")'>$user</a></li>";
+                                if($user != '.' && $user != '..' && $user != '.gitignore') {
+                                    print "<li><a id='ou_" . $user . "' onclick='showUserChat(\"$user\")'>$user</a></li>";
                                 }
                             }
                         ?>
                     </ul>
-                </div>
-                <div>
-                    <!--p>Private chat with: <span id="sel_user"></span></p> 
-                    <div id="private_chat"> </div-->   
-                    <p id="cstatus">Connecting to chat... Please wait...</p> 
-                    <div id="chat" style="display:none">
-                        <input type="text" id="outgoingChatMessage" />
-                        <textarea id="incomingChatMessages"></textarea>
-                    </div>
-                </div>
+                </div>                
             </div>
-            <br style="clear:both" />
         <?php } ?>        
     </body>
 </html>
