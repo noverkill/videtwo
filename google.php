@@ -1,5 +1,6 @@
 <?php
 
+require_once('common.php');
 require_once('includes/User.php');
 require_once('includes/Oauth.php');
 require_once('includes/Google.php');
@@ -31,17 +32,7 @@ if($google->validateAccessToken()){
     
     $user = new GoogleUser($response);
     
-    $ufile = "users/".$user->id;
-    //print "ufile: $ufile<br>";
-    
-    if(! is_file($ufile)){
-        file_put_contents($ufile, (serialize($user)));
-        //print "user not exists<br>";
-    } else {
-        //print "user exists<br>";
-    }
-    
-    $_SESSION['username'] = $user->username;
+    login($user);
     
     header('Location: index.php');
 }

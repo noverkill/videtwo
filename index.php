@@ -92,11 +92,16 @@
             width: 99%;
             margin: 0.1em;
         }
+        
+        #chat > textarea {
+            height: 15em;
+        }
 
+        /*
         #incomingChatMessages {
             height: 15em;
         }
-        
+        */
     </style>  
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 
@@ -264,18 +269,18 @@
                     } else {
 
                         var pch = document.getElementById('chat');
-                        
-                        pch_i = document.createElement('input');
+
+			pch_i = document.createElement('input');
                         pch_i.setAttribute('type', 'text');
                         pch_i.setAttribute('id', "pch_i-" + to_user);
-                        pch_i.style.display = 'block';
-                        pch_i.style.width = CHAT_INPUT_WIDTH;                
-                        pch.appendChild(pch_i);
+                        //pch_i.style.display = 'block';
+                        //pch_i.style.width = CHAT_INPUT_WIDTH;                
+			pch.appendChild(pch_i);
                         
                         var pch_t = document.createElement('Textarea');
                         pch_t.setAttribute('id', "pch_t-" + to_user);
-                        pch_t.style.width = CHAT_TEXTAREA_WIDTH;
-                        pch_t.style.height = CHAT_TEXTAREA_HEIGHT;
+                        //pch_t.style.width = CHAT_TEXTAREA_WIDTH;
+                        //pch_t.style.height = CHAT_TEXTAREA_HEIGHT;
                         pch.appendChild(pch_t);
                     }                         
                 }
