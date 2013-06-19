@@ -1,9 +1,8 @@
 <?php
 
+require_once('../common.php');
 require_once('../includes/Oauth.php');
 require_once('../includes/Google.php');
-
-session_start();
 
 $app_id = '808251293425.apps.googleusercontent.com';
 $app_secret = 'H2YKv7ZL56dh648zbBIHtLrO';

@@ -1,0 +1,68 @@
+*{
+	margin: 0;
+	padding: 0;
+}
+
+.clear {
+	clear: both;
+} 
+
+a {
+	text-decoration: none;
+	color: #4096EE; 
+	cursor: pointer;
+}
+
+a:hover {
+	color: #356AA0;
+}
+
+#top_stripe {
+	display: block;
+	width: 99%;
+	max-width: 36em;
+	border: 0.1em solid #C3D9FF;
+	float: left;           
+}
+
+#top_stripe > *{
+	float: left;
+	margin: 0 0.5em;
+}
+
+#remoteVideos {
+	display: block;
+	width: 99%;
+	max-width: 36em;
+	border: 0.1em solid #C3D9FF;
+	float: left;
+	margin: 0.5em 0;
+}
+
+.remote_video, .local_video {
+	width: 11.5em;           
+	height: 8.8em;
+	background-color: #CCC;
+	border: 0.1em solid #C3D9FF;
+	margin: 0.1em; 
+	float:left;
+}
+
+#chat {
+	display: block;
+	width: 99%;
+	max-width: 36em;
+	border: 0.1em solid #C3D9FF;
+	float: left;
+	margin: 0.5em 0;
+}
+
+#chat > * {
+	float: left;
+	width: 99%;
+	margin: 0.1em;
+}
+
+#chat > textarea {
+	height: 15em;
+}

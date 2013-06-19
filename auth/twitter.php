@@ -1,9 +1,8 @@
 <?php
 
+require_once('../common.php');
 require_once('../includes/Oauth.php');
 require_once('../includes/Twitter.php');
-
-session_start();
 
 $consumer_key = 'eki4CS1p75YqJRIFNu7BpQ';
 $consumer_secret = 'bHtIJK0blP3RWcOnaQc4u30TVIrDkZZj5Vg7rr897o';

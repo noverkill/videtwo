@@ -1,17 +1,21 @@
 <?php 
-    $DOMAIN = "http://videtwo.com";
-    $PAGE   = "index.php";
-    $URL    = $DOMAIN . '/' . $PAGE;
-    
+    $DOMAIN    = "http://videtwo.com";
+    $SUBDOMAIN = "http://videtwo.com";       //"http://max.videtwo.com";
+    $PAGE      = "index.php";
+    $URL       = $DOMAIN . '/' . $PAGE;
+
+	session_set_cookie_params(0, '/', '.videtwo.com');     
     session_start(); 
     
     if(isset($_GET['logout'])){
         session_unset();
         session_destroy();
-        header('Location: index.php');
+        header("Location: $SUBDOMAIN/index.php");
         exit;
     }
-
+	
+	$_SESSION['subdomain'] = $SUBDOMAIN;
+	
     $ROOM_ID = isset($_GET['room']) ? $_GET['room'] : 'lobby';
 ?>
 <!DOCTYPE html>
@@ -69,15 +73,6 @@
             float:left;
         }
         
-        /*
-        .local_video {
-            width: 5.75em;
-            height: 5em;
-            background-color: #CCC;
-            border: 0.1em solid #C3D9FF;
-        }
-        */
-        
         #chat {
             display: block;
             width: 99%;
@@ -97,17 +92,12 @@
             height: 15em;
         }
 
-        /*
-        #incomingChatMessages {
-            height: 15em;
-        }
-        */
     </style>  
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 
         <?php if(isset($_SESSION['username'])) { ?>
         
-            <script src="simplewebrtc.js"></script>
+            <script src="webrtc.js"></script>
             <script src="socket.io.js"></script>
             
             <script> 
@@ -118,10 +108,6 @@
                 
                 ROOM_ID = "<?php echo $ROOM_ID; ?>"
 
-                CHAT_INPUT_WIDTH = '11em';
-                CHAT_TEXTAREA_WIDTH = '11em';
-                CHAT_TEXTAREA_HEIGHT = '11em';                
-                
                 CHAT_TEXTAREA_MAX_ROW = 20; //how many rows go into the texarea before it starts to scroll up
                 
                 var online_users = [];
@@ -150,13 +136,8 @@
                 }
                                                 
                 var webrtc = new WebRTC({
-                    // the id of (or actual element) to hold "our" video
-                    //localVideoEl: 'localVideo',
                     localVideoEl: 'remoteVideos',
-
-                    // the id of or actual element that will hold remote videos
                     remoteVideosEl: 'remoteVideos',
-
                     // immediately ask for camera access
                     autoRequestMedia: true
                 });
@@ -164,7 +145,6 @@
                 // we have to wait until it's ready
                 webrtc.on('readyToCall', function () {
                     current_chat = 'Room Chat';
-                    //$('#cstatus').text('> Room chat');
                     changeChat('cstatus', 'Room chat');                    
                     $('#cstatus').click(showRoomChat);
                     $('#chat').show();
@@ -223,8 +203,6 @@
                     }
                                         
                     changeChat('cstatus', 'Room chat');
-                    
-                    //$("#cstatus").text("> Room chat");
 
                     document.getElementById('outgoingChatMessage').style.display = 'block';
                     document.getElementById('incomingChatMessages').style.display = 'block';
@@ -253,8 +231,6 @@
                     }
                                             
                     to_user = new_user;
-                                            
-                    //$("#cstatus").text("Private chat with " + to_user);
                     
                     changeChat('ou_' + to_user, to_user)
                     
@@ -272,15 +248,11 @@
 
 			pch_i = document.createElement('input');
                         pch_i.setAttribute('type', 'text');
-                        pch_i.setAttribute('id', "pch_i-" + to_user);
-                        //pch_i.style.display = 'block';
-                        //pch_i.style.width = CHAT_INPUT_WIDTH;                
+                        pch_i.setAttribute('id', "pch_i-" + to_user);               
 			pch.appendChild(pch_i);
                         
                         var pch_t = document.createElement('Textarea');
                         pch_t.setAttribute('id', "pch_t-" + to_user);
-                        //pch_t.style.width = CHAT_TEXTAREA_WIDTH;
-                        //pch_t.style.height = CHAT_TEXTAREA_HEIGHT;
                         pch.appendChild(pch_t);
                     }                         
                 }
@@ -398,14 +370,12 @@
             </script>
         <?php } ?>
     </head>
-    <body>
-        <!--h4>Video chat</h4-->
-        
+    <body>       
         <?php if(! isset($_SESSION['username'])) { ?>
-            <a href="/facebook.php">Login with Facebook</a> |
-            <a href="/twitter.php">Login with Twitter</a> |        
-            <a href="/google.php">Login with Google</a> |         
-            <!--a href="/yahoo.php">Login with Yahoo</a-->        
+            <a href="<?php echo $DOMAIN; ?>/facebook.php">Login with Facebook</a> |
+            <a href="<?php echo $DOMAIN; ?>/twitter.php">Login with Twitter</a> |        
+            <a href="<?php echo $DOMAIN; ?>/google.php">Login with Google</a> |         
+            <!--a href="<?php echo $DOMAIN; ?>/yahoo.php">Login with Yahoo</a-->        
         <?php } else { ?>
             <div id="top_stripe">
                 <span>Welcome: <?php print $_SESSION['username']; ?></span> 

@@ -3,6 +3,9 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+session_set_cookie_params(0, '/', '.videtwo.com'); 
+session_start();
+
 //print 'whoami: ' . exec('whoami') . '<br>';
 
 if (! is_dir("users")) mkdir("users");
@@ -23,8 +26,11 @@ function login($user) {
     $_SESSION['username'] = $user->username;    
 }
 
-function debug($message) {
-    print "$message<br>";
+function debug($message, $title = '') {
+    if($title!='') print "$title: <br>";
+    print '<pre>';
+	print_r($message);
+	print '</pre><br>';
 }
 
 ?>

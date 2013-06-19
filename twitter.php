@@ -1,10 +1,9 @@
 <?php
 
+require_once('common.php');
 require_once('includes/User.php');
 require_once('includes/Oauth.php');
 require_once('includes/Twitter.php');
-
-session_start();
 
 $consumer_key = 'eki4CS1p75YqJRIFNu7BpQ';
 $consumer_secret = 'bHtIJK0blP3RWcOnaQc4u30TVIrDkZZj5Vg7rr897o';
@@ -29,5 +28,5 @@ if($twitter->validateAccessToken()){
     
     $_SESSION['username'] = $user->username;
     
-    header('Location: index.php');
+	header('Location: ' . $_SESSION['subdomain'] . '/index.php');
 }

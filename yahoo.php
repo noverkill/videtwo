@@ -1,10 +1,9 @@
 <?php
 
+require_once('common.php');
 require_once('includes/User.php');
 require_once('includes/Oauth.php');
 require_once('includes/Yahoo.php');
-
-session_start();
 
 $consumer_key = 'dj0yJmk9M1FwNVVWQnVrV2VhJmQ9WVdrOWRuWlZibFIzTXpBbWNHbzlNVE15TnpnM05qRTJNZy0tJnM9Y29uc3VtZXJzZWNyZXQmeD1mNw--';
 $consumer_secret = 'f077cd3f27c1b2d91e8c9f4e5a42a14368c48b2a';
@@ -29,6 +28,6 @@ if($yahoo->validateAccessToken()){
     
     $_SESSION['username'] = $user->username;
     
-    header('Location: index.php');
+	header('Location: ' . $_SESSION['subdomain'] . '/index.php');
 */
 }
