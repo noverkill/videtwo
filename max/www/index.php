@@ -1,6 +1,10 @@
 <?php 		
 	include('common.php');
 	
+	include "inc/rain.tpl.class.php"; //include Rain TPL
+	raintpl::$tpl_dir = "tpl/"; // template directory
+	raintpl::$cache_dir = "tmp/"; // cache directory
+	
 	if(! isset($_SESSION['username'])) {
 		header('Location: login.php');
 		exit;
@@ -9,7 +13,7 @@
     if(isset($_GET['logout'])){
         session_unset();
         session_destroy();
-        header("Location: $SUBDOMAIN/index.php");
+        header("Location: $SUBDOMAIN/login.php");
         exit;
     }
 	
@@ -38,6 +42,7 @@
 			<a id="create_room" href="#">Create room</a>
 			<a href="?logout">Logout</a>
 		</div>
+        <h1>New Chat</h1>
 		<br class="clear" />
 		<div id="remoteVideos"></div>
 		<br class="clear" />
