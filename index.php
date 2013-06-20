@@ -42,9 +42,6 @@
 		<div id="remoteVideos"></div>
 		<br class="clear" />
 		<div id="bottom_stripe">
-			<div>
-				<div id="localVideo"></div>
-			</div>
 			<div id="chat" style="display:none">
 				<p>Text Chat</p>
 				<input type="text" id="outgoingChatMessage" />
@@ -53,7 +50,6 @@
 			<br class="clear" />
 			<div>
 				<p><a id="cstatus">Connecting to chat...</a></p>
-				<p>Private Chat with User:</p>
 				<ul id="online_users">
 					<?php
 						$users = scandir('/var/www/users/');

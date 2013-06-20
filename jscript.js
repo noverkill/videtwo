@@ -98,7 +98,7 @@ function showRoomChat(){
 	
 function changeChat(new_chat_id, new_chat_text) {
 	if(current_chat_id !== null) $('#'+current_chat_id).text(current_chat_text);
-	current_chat_id = new_chat_id;
+	current_chat_id = new_chat_id.replace(/\./gi, "\\.");
 	current_chat_text = new_chat_text; 
 	$('#'+current_chat_id).text('> ' + current_chat_text);                                       
 }
