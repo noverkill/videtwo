@@ -1,0 +1,165 @@
+*{
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	color: #fff;	
+	background: #333;	
+	width: 100%;			
+}
+
+.clear {
+	clear: both;
+} 
+
+a {
+text-decoration: none;
+	cursor: pointer;
+}
+
+a:hover {
+	color: #356AA0;
+}
+
+ul {
+	list-style-type: none;
+}
+
+#header, #footer {
+	background: linear-gradient(to bottom, #3574C6 0%, #215F9A 100%) repeat scroll 0 0 transparent;
+	border-top: 1px solid #5983B9;
+	box-shadow: 0 -1px 3px 0 rgba(0, 0, 0, 0.5);
+	color: #FFFFFF;
+	font: 1.5em/2em 'BebasNeue',Arial,sans-serif;
+	height: 2em;
+	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+	text-align: center;
+}
+
+#tp {
+	background: #3468AA;
+	background: linear-gradient(to bottom, #3574C6 0%, #215F9A 100%) repeat scroll 0 0 transparent;
+	border-bottom: 1px solid #285184;
+	border-top: 1px solid #6494D3;	
+	width: 100%;			  
+	height: 1.6em;	
+}
+
+#top_strip {
+	display: table;
+	margin-left: auto;
+	margin-right:auto;									
+	padding: 0.2em 0;
+}
+
+#top_strip > *{
+	float: left;
+	margin: 0 0.5em;
+	color: #fff;			
+}
+
+#rv {
+	width: 100%;
+	background: #333333;	
+	padding: 1em 0;			
+}
+
+#remoteVideos {
+	display: table;
+	width: 100%;
+	max-width: 35.2em;
+	margin-left: auto;
+	margin-right:auto;
+	background: #292929;				
+}
+
+.remote_video, .local_video {
+	width: 11.5em;           
+	height: 8.8em;
+	background-color: #CCC;
+	margin: 0.1em; 
+	float:left;
+}
+
+#rvc {
+	width: 100%;
+	background: linear-gradient(to bottom, #3574C6 0%, #215F9A 100%) repeat scroll 0 0 transparent;	
+	padding-bottom: 1em;			
+}
+
+#chat {
+	display: table;
+	width: 100%;
+	max-width: 35.2em;
+	margin-left: auto;
+	margin-right:auto;
+	background: linear-gradient(to bottom, #3574C6 0%, #215F9A 100%) repeat scroll 0 0 transparent;
+	border-bottom: 1px solid #285184;
+	border-top: 1px solid #6494D3;				
+}
+
+#chat > * {
+	float: left;
+	margin: 0.2em;
+}
+
+#chat > p {
+	text-align: center;	
+	font-weight: bold;	
+	width: 100%;					
+}	
+
+#chat > div {
+	width: 70%;					
+}	
+
+#chat > ul {
+	width: 25%;		
+	color: #fff;		
+	margin-top: 1.5em;
+}	
+
+#ti > input {
+	width: 100%;
+	border:0;							
+}	
+
+#ti > textarea {
+	width: 100%;
+	height: 15em;
+	background-color: #CCC;		
+	border:0;			
+}	
+
+.pull-left {
+	float: left;
+}
+
+.pull-right {
+	float: right;
+}
+
+.footer-bottom {
+	color: #FFFFFF;
+	font: 19px/39px 'BebasNeue',Arial,sans-serif;
+	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+
+.footer-bottom ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+
+.footer-bottom ul li {
+	float: left;
+	line-height: 37px;
+	margin-right: 5px;
+}
+
+.footer-links a {
+	color: #4096EE;
+}
