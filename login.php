@@ -2,17 +2,37 @@
 	include('common.php');	
 	
 	$_SESSION['subdomain'] = $SUBDOMAIN; 
+	
+	// template engine configurations
+	require "library/Rain/autoload.php";
+	
+	// namespace
+	use Rain\Tpl;
+	
+	// config
+	$config = array(
+	"tpl_dir"       => "design/dark/",
+	"cache_dir"     => "cache/",
+	"debug"         => true, // set to false to improve the speed
+	);
+
+	Tpl::configure( $config );
+
+	// create the Tpl object
+    $tpl = new Tpl;
+
+    // assign variables
+    $tpl->assign("loginFacebook", $DOMAIN.'/facebook.php' );
+    $tpl->assign("loginTwitter", $DOMAIN.'/twitter.php' );
+    $tpl->assign("loginGoogle", $DOMAIN.'/google.php' );
+
+
+
+
+    // draw the template
+    $tpl->draw( "login" );
+	
 ?>
-<!DOCTYPE html>
-<html>
-    <head>
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<link rel="stylesheet" type="text/css" href="/style.css" media="screen" />
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    </head>
-    <body>       
-		<a href="<?php echo $DOMAIN; ?>/facebook.php">Login with Facebook</a> |
-		<a href="<?php echo $DOMAIN; ?>/twitter.php">Login with Twitter</a> |        
-		<a href="<?php echo $DOMAIN; ?>/google.php">Login with Google</a> |     
-    </body>
-</html>
+
+      
+	
