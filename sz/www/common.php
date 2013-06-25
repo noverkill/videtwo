@@ -5,7 +5,7 @@ ini_set('display_errors', 1);
 
 $SITE      = "videtwo.com";
 $DOMAIN    = "http://" . $SITE;
-$SUBDOMAIN = "http://max." . $SITE;
+$SUBDOMAIN = "http://sz." . $SITE;
 $PAGE      = "index.php";
 $URL       = $DOMAIN . '/' . $PAGE;
 

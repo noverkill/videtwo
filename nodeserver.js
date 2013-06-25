@@ -2,9 +2,10 @@
 var yetify = require('yetify'),
     config = require('getconfig'),
     uuid = require('node-uuid'),
-    io = require('socket.io').listen(config.server.port, {log: 1});
+    io = require('socket.io').listen(config.server.port, {log: 0});
 
 var usernames = [];
+var clientnames = [];
 
 io.sockets.on('connection', function (client) {
     // pass a message
@@ -29,8 +30,10 @@ io.sockets.on('connection', function (client) {
         console.log(username);
         client.username = username;
         usernames.push(username);
-        //client.broadcast.emit('userconnected', username);
-        io.sockets.emit('userconnected', usernames);
+        clientnames.push(client.id);
+        io.sockets.emit('userconnected', [usernames, clientnames]);
+		console.log(usernames);
+		console.log(clientnames);
     });
     
     client.on('join', function (name) {
@@ -42,12 +45,15 @@ io.sockets.on('connection', function (client) {
     });
 
     client.on('disconnect',function() {
-	//insert data corresponding to current socket into database
-	console.log('The client has disconnected!');
-	console.log(client.id);
-	console.log(client.username);
-	usernames.splice(usernames.indexOf(client.username), 1);
-	io.sockets.emit('userdeleted', client.username);
+		//insert data corresponding to current socket into database
+		console.log('The client has disconnected!');
+		console.log(client.id);
+		console.log(client.username);
+		usernames.splice(usernames.indexOf(client.username), 1);
+		clientnames.splice(clientnames.indexOf(client.id), 1);
+		io.sockets.emit('userdeleted', client.username);
+		console.log(usernames);
+		console.log(clientnames);
     });
 
     function leave() {

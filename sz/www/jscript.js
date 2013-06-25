@@ -1,3 +1,4 @@
+var online_clients = [];
 var online_users = [];
 
 var current_chat_id = null;
@@ -90,7 +91,8 @@ function showRoomChat(){
 		pch_t.style.display = 'none';
 	}
 						
-	changeChat('cstatus', 'Room chat');
+	//changeChat('cstatus', 'Room chat');
+	changeChat('ou_' + USERNAME, USERNAME)
 
 	document.getElementById('outgoingChatMessage').style.display = 'block';
 	document.getElementById('incomingChatMessages').style.display = 'block';
@@ -100,13 +102,17 @@ function changeChat(new_chat_id, new_chat_text) {
 	if(current_chat_id !== null) $('#'+current_chat_id).text(current_chat_text);
 	current_chat_id = new_chat_id.replace(/\./gi, "\\.");
 	current_chat_text = new_chat_text; 
-	$('#'+current_chat_id).text('> ' + current_chat_text);                                       
+	$('#'+current_chat_id).html('&raquo; ' + current_chat_text);                                       
 }
 
-function showUserChat(new_user){
-
-	document.getElementById('outgoingChatMessage').style.display = 'none';
-	document.getElementById('incomingChatMessages').style.display = 'none';
+function showUserChat(new_user, sw){
+	
+	console.log('showUserChat');
+	
+	console.log(new_user);
+	
+	if(sw === 1) document.getElementById('outgoingChatMessage').style.display = 'none';
+	if(sw === 1) document.getElementById('incomingChatMessages').style.display = 'none';
 	
 	if(!!to_user) to_user.replace(/\./gi, "\\.");
 
@@ -114,33 +120,37 @@ function showUserChat(new_user){
 	var pch_t = document.getElementById('pch_t-' + to_user);
 	
 	if(!!pch_i) {
-		pch_i.style.display = 'none';
-		pch_t.style.display = 'none';
+		if(sw === 1) pch_i.style.display = 'none';
+		if(sw === 1) pch_t.style.display = 'none';
 	}
 							
 	to_user = new_user;
 	
-	changeChat('ou_' + to_user, to_user)
+	if(sw === 1) changeChat('ou_' + to_user, to_user)
 	
 	pch_i = document.getElementById('pch_i-' + to_user);
 	pch_t = document.getElementById('pch_t-' + to_user);
 	
 	if(!!pch_i) {
 		
-		pch_i.style.display = 'block';
-		pch_t.style.display = 'block';
+		if(sw === 1) pch_i.style.display = 'block';
+		if(sw === 1) pch_t.style.display = 'block';
 	
 	} else {
-
+		  
 		var pch = document.getElementById('chat');
-
-pch_i = document.createElement('input');
+	
+		pch_i = document.createElement('input');
 		pch_i.setAttribute('type', 'text');
-		pch_i.setAttribute('id', "pch_i-" + to_user);               
-pch.appendChild(pch_i);
+		pch_i.setAttribute('id', "pch_i-" + to_user);   
+		pch_i.style.display = 'none';
+		if(sw === 1) pch_i.style.display = 'block';
+		pch.appendChild(pch_i);
 		
 		var pch_t = document.createElement('Textarea');
 		pch_t.setAttribute('id', "pch_t-" + to_user);
+		pch_t.style.display = 'none';
+		if(sw === 1) pch_t.style.display = 'block';
 		pch.appendChild(pch_t);
 	}                         
 }
@@ -183,24 +193,36 @@ $(function(){
 		}
 	});
 
-	webrtc.connection.on('userconnected', function(users) {
+	webrtc.connection.on('userconnected', function(msg) {
 		console.log('userconnected');
+		
+		console.log(JSON.stringify(msg));
+		
+		var users = msg[0];
+		var clients = msg[1];
+		
 		console.log(users);
+		console.log(clients);
+		
 		for (var i in users) {
-			
+
+			clientid = clients[i];		
 			username = users[i];
 			
+			console.log(username);
+			
 			if(username == USERNAME) continue;
-
 			if(online_users.indexOf(username)>-1) continue;
 			
 			online_users.push(username);
-										
+			online_clients.push(clientid);
+			
+			/*			
 			if(document.getElementById('ou_' + username) !== null) {
 				document.getElementById('ou_' + username).style.color = "green";
 				continue;
 			}
-
+			
 			var ul = document.getElementById('online_users');
 			var li = document.createElement('li');
 			var a = document.createElement('a');
@@ -211,7 +233,11 @@ $(function(){
 			console.log(a);
 			li.appendChild(a);
 			ul.appendChild(li);
+			*/
 		}
+		
+		console.log(online_users);
+		console.log(online_clients);
 	});
 	
 	webrtc.connection.on('userdeleted', function(username) {
@@ -219,7 +245,10 @@ $(function(){
 		console.log(username);
 		if(username == USERNAME) return;
 		online_users.splice(online_users.indexOf(username), 1);
-		$('#ou_' + username.replace(/\./gi, "\\.")).css('color', 'grey');
+		online_clients.splice(online_users.indexOf(username), 1);
+		//$('#ou_' + username.replace(/\./gi, "\\.")).css('color', 'grey');
+		console.log(online_users);
+		console.log(online_clients);
 	});
 	
 	webrtc.connection.on('message', function(message) {
@@ -234,9 +263,16 @@ $(function(){
 			
 			if (message.to) {
 				if (message.to == USERNAME) {
-					showUserChat(message.from);
-					console.log('pch_t-' + to_user);
+					console.log(message.from);
+					showUserChat(message.from, 0);
+					var ouhtml = $('#ou_' + message.from).html();
+					if(ouhtml==message.from) {
+						ouhtml = ouhtml + " <span>&bull;<span>";
+						$('#ou_' + message.from).html(ouhtml);
+					}
 					textarea = document.getElementById('pch_t-' + to_user);  
+					console.log(to_user);
+					console.log(textarea);
 				}
 			} else if (message.room == ROOM_ID || message.from == 'system') {
 				textarea = document.getElementById('incomingChatMessages');

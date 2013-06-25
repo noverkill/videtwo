@@ -1,0 +1,159 @@
+html, body{
+	height: 90% ;
+	width:100%;
+	padding:0;
+	margin:0 auto;
+	font-family:Verdana, Geneva, sans-serif;
+	font-family:"Segoe UI";
+	font-size:16px;
+	background-color:#333;
+	
+	
+}
+#container
+{
+	width:100%;
+	height: 70% ;
+}
+
+#logo
+{
+	margin:5% auto 0;
+	width: 300px;
+	height: 80px;
+	background: #333 url(images/logo.png) no-repeat;
+}
+#header
+{
+	display:table;
+	width:100%;
+	height: 30% ;
+	background-color:#333;
+	
+}
+#txt01
+{
+	font-size:2em;
+	color:#CCC;
+	text-align:center;
+	vertical-align:bottom;
+	display:table-cell;
+	height: 50% ;
+}
+#container
+{
+	display:table;
+}
+#icons
+{
+	background-color:#333;
+	display:table-cell;
+	width:50%;
+	height:70%;
+	text-align:center;
+	vertical-align:top;
+	
+	
+}
+#auth-facebook, #auth-twitter, #auth-google
+{
+	background-color:#333;
+	display:inline-block;
+	width:256px;
+	height:256px;
+	margin:0;
+	padding:0;
+	
+	
+} 
+span
+{
+	margin:0;
+	padding:0;
+}
+a
+{
+	text-decoration:none;
+	color:#FFF;
+	margin:0;
+	padding:0;
+	
+	background-color:#333;
+	display:table-cell;
+	font-size: 4em;
+	font-family:"Segoe UI";
+	text-align:right;
+	vertical-align:middle;
+	
+	
+}
+
+#facebook-logo, #twitter-logo, #google-logo
+{
+	height: 256px;
+	width: 256px;
+	background-color:#999;
+	display:block;
+	margin:0;
+	padding:0;
+
+
+
+	
+}
+#facebook-logo
+{
+
+	background: #333 url(images/Facebook.png) no-repeat;
+}
+#twitter-logo
+{
+	background: #333 url(images/Twitter.png) no-repeat;
+}
+#google-logo
+{
+	background: #333 url(images/Google.png) no-repeat;
+
+}
+.icon
+{
+	margin:0; padding:0;
+	display:table-cell;
+	background-color:#333;
+
+}
+
+a:hover
+{
+	border-bottom: 5px #CCC solid;
+}
+/*********************************************8   MOBILE *************************************/
+
+ @media only screen and (max-width: 850px) { /* vertical position*/
+ 
+		#txt01
+		{
+			font-size:1em;
+		}
+		
+		#facebook-logo, #twitter-logo, #google-logo, #auth-facebook, #auth-twitter, #auth-google
+		{
+			height: 65px;
+			width: 64px;	
+		}
+		#facebook-logo
+{
+
+	background: #333 url(images/64_Facebook.png) no-repeat;
+	}
+	#twitter-logo
+	{
+		background: #333 url(images/64_Twitter.png) no-repeat;
+	}
+	#google-logo
+	{
+		background: #333 url(images/64_Google.png) no-repeat;
+	
+	}
+
+    }
