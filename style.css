@@ -3,13 +3,19 @@
 	padding: 0;
 }
 
+html, body {
+	/*color: #fff;	
+	background: #000;*/
+	width: 100%;	
+	height: 100%;
+}
+
 .clear {
 	clear: both;
 } 
 
 a {
-	text-decoration: none;
-	color: #4096EE; 
+text-decoration: none;
 	cursor: pointer;
 }
 
@@ -17,52 +23,168 @@ a:hover {
 	color: #356AA0;
 }
 
-#top_stripe {
-	display: block;
-	width: 99%;
-	max-width: 36em;
-	border: 0.1em solid #C3D9FF;
-	float: left;           
+ul {
+	list-style-type: none;
 }
 
-#top_stripe > *{
+#wrapper {
+	min-height: 100%;
+	position: relative;
+}
+
+#header, #bp, #footer {
+	background: linear-gradient(to bottom, #3574C6 0%, #215F9A 100%) repeat scroll 0 0 transparent;
+	border-top: 1px solid #5983B9;
+	box-shadow: 0 -1px 3px 0 rgba(0, 0, 0, 0.5);
+	color: #FFFFFF;
+	font: 1.5em/2em 'BebasNeue',Arial,sans-serif;
+	height: 2em;
+	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+	text-align: center;
+}
+
+#bp {
+	padding-bottom: 2em; 
+	height: 1em;
+	border: 0;
+}
+
+#footer {
+	width:100%;
+	min-height: 2em;
+	position: absolute;
+	bottom: 0;
+	background: #000;
+	border: 0;
+}	
+
+#tp {
+	background: #3468AA;
+	background: linear-gradient(to bottom, #3574C6 0%, #215F9A 100%) repeat scroll 0 0 transparent;
+	border-bottom: 1px solid #285184;
+	border-top: 1px solid #6494D3;	
+	width: 100%;			  
+	min-height: 1.6em;	
+}
+
+#top_strip {
+	display: table;
+	margin-left: auto;
+	margin-right:auto;									
+	padding: 0.2em 0;
+}
+
+#top_strip > *{
 	float: left;
 	margin: 0 0.5em;
+	color: #fff;
+	min-width: 200px;
+	font-size: 1.5em;
+	padding: 0.5em;
+}
+
+#rv {
+	float: left;
+	width: 100%;
+	background: #333333;	
+	padding: 1em 0;		
+	min-width: 130px;
+	min-height: 10.4em;
 }
 
 #remoteVideos {
 	display: block;
-	width: 99%;
-	max-width: 36em;
-	border: 0.1em solid #C3D9FF;
-	float: left;
-	margin: 0.5em 0;
+	width: 100%;
+	max-width: 36.7em;
+	margin-left: auto;
+	margin-right:auto;
+	/*background: #292929;*/	
+	/*border: 1px solid red;*/
+}
+
+.vframe {
+	float:left;
+	width: 17.25em; /*11.5em;*/           
+	height: 15em; /*10.4em;*/
+    background-color: #eee;
+	-moz-box-shadow: 0 0 5px #fff;
+	-webkit-box-shadow: 0 0 5px #fff;
+	box-shadow: 0 0 5px #ccc;
+	margin: 0.25em;
+	padding: 0.11em;	
+	text-align: center;	
+}
+
+.vframe > a {
+	color: #000;
+}
+.vframe > a.me {
+	color: #3574C6;
+}
+
+.vframe > a > span {
+	color: orange;
 }
 
 .remote_video, .local_video {
-	width: 11.5em;           
-	height: 8.8em;
-	background-color: #CCC;
-	border: 0.1em solid #C3D9FF;
-	margin: 0.1em; 
-	float:left;
+	width: 17.25em; /*11.5em;*/           
+	height: 13.05em; /*8.7em;*/
+}
+
+#rvc {
+	width: 100%;
+	background: linear-gradient(to bottom, #3574C6 0%, #215F9A 100%) repeat scroll 0 0 transparent;
+	border-bottom: 1px solid #285184;
+	border-top: 1px solid #6494D3;		
+	padding: 0.5em 0;	
+	padding-bottom: 1em;	
+	float: left;	
 }
 
 #chat {
 	display: block;
-	width: 99%;
-	max-width: 36em;
-	border: 0.1em solid #C3D9FF;
-	float: left;
-	margin: 0.5em 0;
+	width: 100%;
+	max-width: 36.3em;
+	margin-left: auto;
+	margin-right:auto;
+	/*border: 1px solid red;*/
 }
 
-#chat > * {
+#chat > input {
+	width: 100%;
 	float: left;
-	width: 99%;
-	margin: 0.1em;
-}
+	margin: 0.2em 0;
+	font-size: 1.5em;
+}	
 
 #chat > textarea {
+	width: 100%;
 	height: 15em;
+	float: left;
+	margin: 0.2em 0;	
+	background-color: #CCC;		
+	border:0;			
+}
+
+@media screen and (min-width: 40.5em) {
+	#top_strip > * {
+		min-width: 0;
+		font-size: 1em;
+		padding: 0;
+	}
+ 
+	.vframe {
+		width: 11.5em;           
+		height: 10.4em;
+	}
+
+	.remote_video, .local_video {
+		width: 11.5em;           
+		height: 8.7em;
+	}
+
+	#chat > input {
+		border: 0.1em;
+		font-size: 0.9em;
+	}	
 }

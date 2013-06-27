@@ -2,67 +2,66 @@
 var yetify = require('yetify'),
     config = require('getconfig'),
     uuid = require('node-uuid'),
-    io = require('socket.io').listen(config.server.port, {log: 0});
+    io = require('socket.io').listen(config.server.port,{log: 0});
 
-var usernames = [];
-var clientnames = [];
+var users = [];
+
+Array.prototype.push2 = function(a){
+	this.push(a);
+	return this;
+}
+
+Array.prototype.remove2 = function(id){
+	//console.log(id);
+    var idx = -1;	
+	for (var i = 0; i < this.length; i++) {
+        if (this[i]['id'] == id) {
+            idx = i;
+			break;
+        }
+    }
+	//console.log(idx);
+	if( idx > -1) this.splice(idx, 1);
+	//console.log(this);
+	return this;
+}
 
 io.sockets.on('connection', function (client) {
     // pass a message
     client.on('message', function (details) {
-            
         var otherClient = io.sockets.sockets[details.to];
 
         if (!otherClient) {
-            console.log('Message Received: ', details);
-            client.broadcast.emit('message', details);
             return;
         }
-        
         delete details.to;
-        
         details.from = client.id;
-        
         otherClient.emit('message', details);
     });
 
-    client.on('adduser', function(username){
-        console.log(username);
-        client.username = username;
-        usernames.push(username);
-        clientnames.push(client.id);
-        io.sockets.emit('userconnected', [usernames, clientnames]);
-		console.log(usernames);
-		console.log(clientnames);
-    });
-    
-    client.on('join', function (name) {
-        client.join(name);
-        io.sockets.in(name).emit('joined', {
-            room: name,
-            id: client.id
+    client.on('join', function (room_name, user_name) {
+        client.join(room_name);
+		client.username = user_name;
+        io.sockets.in(room_name).emit('joined', {
+            roomname: room_name,
+            username: client.username,
+            users: users.push2({'id': client.id, 'name': user_name}),
+            clientid: client.id
         });
-    });
-
-    client.on('disconnect',function() {
-		//insert data corresponding to current socket into database
-		console.log('The client has disconnected!');
-		console.log(client.id);
-		console.log(client.username);
-		usernames.splice(usernames.indexOf(client.username), 1);
-		clientnames.splice(clientnames.indexOf(client.id), 1);
-		io.sockets.emit('userdeleted', client.username);
-		console.log(usernames);
-		console.log(clientnames);
     });
 
     function leave() {
         var rooms = io.sockets.manager.roomClients[client.id];
+		
+		//console.log('leave');
+		//console.log(client.id);
+		
         for (var name in rooms) {
             if (name) {
                 io.sockets.in(name.slice(1)).emit('left', {
                     room: name,
-                    id: client.id
+                    id: client.id,
+					users: users.remove2(client.id)
                 });
             }
         }

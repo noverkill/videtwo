@@ -32,11 +32,14 @@ var webrtc = new WebRTC({
 
 // we have to wait until it's ready
 webrtc.on('readyToCall', function () {
+	
+	$('#ou_' + USERNAME.replace(/\./gi, "\\.")).html(USERNAME);
+	
 	current_chat = 'Room Chat';
 	changeChat('cstatus', 'Room chat');                    
 	$('#cstatus').click(showRoomChat);
 	$('#chat').show();
-	webrtc.joinRoom(ROOM_ID);
+	webrtc.joinRoom(ROOM_ID, USERNAME);
 });
 				  
 $(document).keypress(function(event) {
@@ -226,7 +229,7 @@ $(function(){
 		
 		var new_data, textarea, total;
 		
-		console.log(message);
+		//console.log(message);
 		
 		if(message.message) {
 			
