@@ -1,4 +1,3 @@
-var online_clients = [];
 var online_users = [];
 
 var current_chat_id = null;
@@ -33,11 +32,14 @@ var webrtc = new WebRTC({
 
 // we have to wait until it's ready
 webrtc.on('readyToCall', function () {
+	$('#ou_' + USERNAME.replace(/\./gi, "\\.")).html(USERNAME);
+	
 	current_chat = 'Room Chat';
 	changeChat('cstatus', 'Room chat');                    
 	$('#cstatus').click(showRoomChat);
 	$('#chat').show();
-	webrtc.joinRoom(ROOM_ID);
+	webrtc.joinRoom(ROOM_ID, USERNAME);
+
 });
 				  
 $(document).keypress(function(event) {
@@ -81,6 +83,13 @@ $(document).keypress(function(event) {
 	}
 });
 
+function changeChat(new_chat_id, new_chat_text) {
+	if(current_chat_id !== null) $('#'+current_chat_id).text(current_chat_text);
+	current_chat_id = new_chat_id.replace(/\./gi, "\\.");
+	current_chat_text = new_chat_text; 
+	$('#'+current_chat_id).html('&raquo; ' + current_chat_text);                                       
+}
+
 function showRoomChat(){
 	
 	var pch_i = document.getElementById('pch_i-' + to_user);
@@ -98,13 +107,6 @@ function showRoomChat(){
 	document.getElementById('incomingChatMessages').style.display = 'block';
 }
 	
-function changeChat(new_chat_id, new_chat_text) {
-	if(current_chat_id !== null) $('#'+current_chat_id).text(current_chat_text);
-	current_chat_id = new_chat_id.replace(/\./gi, "\\.");
-	current_chat_text = new_chat_text; 
-	$('#'+current_chat_id).html('&raquo; ' + current_chat_text);                                       
-}
-
 function showUserChat(new_user, sw){
 	
 	console.log('showUserChat');
@@ -154,7 +156,32 @@ function showUserChat(new_user, sw){
 		pch.appendChild(pch_t);
 	}                         
 }
-					
+
+function getUserChatTextArea (user) {
+
+	var pch_t = document.getElementById('pch_t-' + user);
+	
+	if(!!pch_i) {
+
+	} else {
+		  
+		var pch = document.getElementById('chat');
+	
+		var pch_i = document.createElement('input');
+		pch_i.setAttribute('type', 'text');
+		pch_i.setAttribute('id', "pch_i-" + user);   
+		pch_i.style.display = 'none';
+		pch.appendChild(pch_i);
+		
+		pch_t = document.createElement('Textarea');
+		pch_t.setAttribute('id', "pch_t-" + user);
+		pch_t.style.display = 'none';
+		pch.appendChild(pch_t);
+	} 
+	
+	return pch_t;
+}
+	
 $(function(){
 	 
 	$("#create_room").click(function(){
@@ -264,14 +291,15 @@ $(function(){
 			if (message.to) {
 				if (message.to == USERNAME) {
 					console.log(message.from);
-					showUserChat(message.from, 0);
+					//showUserChat(message.from, 0);
+					/*
 					var ouhtml = $('#ou_' + message.from).html();
 					if(ouhtml==message.from) {
 						ouhtml = ouhtml + " <span>&bull;<span>";
 						$('#ou_' + message.from).html(ouhtml);
 					}
-					textarea = document.getElementById('pch_t-' + to_user);  
-					console.log(to_user);
+					*/
+					textarea = getUserChatTextArea(message.from); //document.getElementById('pch_t-' + to_user);  
 					console.log(textarea);
 				}
 			} else if (message.room == ROOM_ID || message.from == 'system') {
@@ -286,8 +314,9 @@ $(function(){
 		}
 	});
 
+	/*
 	webrtc.connection.on('connect', function() {
 		webrtc.connection.emit('adduser', USERNAME);
 	});
-							
+	*/					
 });

@@ -22,7 +22,13 @@ format = function(date){
 	//return ''+yyyy+'-'+mm+'-'+dd+'-'+hh+':'+ms+':'+ss;
 	return hh+':'+ms+':'+ss;
 }
-								
+
+//escape usernames before use with jQuery id selector
+//(because the dot in the username create problems)
+u = function (n) {
+	return n.replace(/\./gi, "\\.");
+}
+
 var webrtc = new WebRTC({
 	localVideoEl: 'remoteVideos',
 	remoteVideosEl: 'remoteVideos',
@@ -32,13 +38,13 @@ var webrtc = new WebRTC({
 
 // we have to wait until it's ready
 webrtc.on('readyToCall', function () {
+		 
+	$('.me').html(USERNAME);
 	
-	$('#ou_' + USERNAME.replace(/\./gi, "\\.")).html(USERNAME);
-	
-	current_chat = 'Room Chat';
-	changeChat('cstatus', 'Room chat');                    
-	$('#cstatus').click(showRoomChat);
 	$('#chat').show();
+	
+	showRoomChat();
+	
 	webrtc.joinRoom(ROOM_ID, USERNAME);
 });
 				  
@@ -46,19 +52,33 @@ $(document).keypress(function(event) {
 	
 	if(event.which == 13) {
 		
+		console.log('keypress');
+		
 		event.preventDefault();                                              
 		
-		if(event.target.id == "pch_i-" + to_user) {
+		//console.log(event.target.id);
+		
+		var tid = event.target.id.split('-');
+
+		console.log(tid);
+		
+		//console.log(tid[0]);
+		
+		if(tid[0] == 'pch_i') {
+			
+			var to_user = tid[1];
+			
+			//console.log(to_user);
 			
 			var now = format(new Date());
 			
 			var sid = webrtc.connection.socket.sessionid;                         
 			
-			console.log(event.target);
-			
-			//console.log("#pch_i-" + to_user);
+			//console.log(event.target);
 		
-			var msg = event.target.value; //$("#pch_i-" + to_user).val();
+			var msg = event.target.value;
+			
+			$(event.target).val('');
 
 			var message = {'sent': now, 'from': USERNAME, 'to': to_user, 'room': ROOM_ID, 'message': msg};
 		
@@ -66,7 +86,9 @@ $(document).keypress(function(event) {
 			
 			console.log(message);
 			
-			var textarea = document.getElementById('pch_t-' + to_user); 
+			var textarea = getUserChatTextArea(to_user); 
+			
+			console.log(textarea);
 			
 			var new_data = now + '(to:' + to_user + ')>' + msg;
 			
@@ -79,73 +101,95 @@ $(document).keypress(function(event) {
 			if (total.length > CHAT_TEXTAREA_MAX_ROW) total = total.slice(total.length - CHAT_TEXTAREA_MAX_ROW);
 			
 			textarea.value = total.join("\n");
+			
+		} else if ( tid[0] == 'outgoingChatMessage') {
+		
+			event.preventDefault();
+	
+			var now = format(new Date());
+			
+			var sid = webrtc.connection.socket.sessionid;    
+			
+			var msg = $('#outgoingChatMessage').val();
+			
+			$('#outgoingChatMessage').val('');
+
+			var message = {'sent': now, 'from': USERNAME, 'room': ROOM_ID, 'message': msg};
+		
+			webrtc.connection.emit('message', message);
+			
+			//console.log(message);
+			
+			var textarea = document.getElementById('incomingChatMessages');
+			var new_data = message.sent + ' > ' + message.message;
+			var total = ((textarea.value ? textarea.value + "\n" : "") + new_data).split("\n");
+			console.log(total);
+			if (total.length > CHAT_TEXTAREA_MAX_ROW) total = total.slice(total.length - CHAT_TEXTAREA_MAX_ROW);
+			textarea.value = total.join("\n");
 		}
 	}
 });
 
 function showRoomChat(){
 	
-	var pch_i = document.getElementById('pch_i-' + to_user);
-	var pch_t = document.getElementById('pch_t-' + to_user);
-	
-	if(!!pch_i) {
-		pch_i.style.display = 'none';
-		pch_t.style.display = 'none';
-	}
-						
-	changeChat('cstatus', 'Room chat');
+	$('#chat').children().hide();
 
 	document.getElementById('outgoingChatMessage').style.display = 'block';
-	document.getElementById('incomingChatMessages').style.display = 'block';
-}
+	document.getElementById('incomingChatMessages').style.display = 'block';	
 	
-function changeChat(new_chat_id, new_chat_text) {
-	if(current_chat_id !== null) $('#'+current_chat_id).text(current_chat_text);
-	current_chat_id = new_chat_id.replace(/\./gi, "\\.");
-	current_chat_text = new_chat_text; 
-	$('#'+current_chat_id).text('> ' + current_chat_text);                                       
-}
+	$('.vframe>a').removeClass('selected');
+	
+	$('.me').addClass('selected');
 
-function showUserChat(new_user){
-
-	document.getElementById('outgoingChatMessage').style.display = 'none';
-	document.getElementById('incomingChatMessages').style.display = 'none';
-	
-	if(!!to_user) to_user.replace(/\./gi, "\\.");
-
-	var pch_i = document.getElementById('pch_i-' + to_user);
-	var pch_t = document.getElementById('pch_t-' + to_user);
-	
-	if(!!pch_i) {
-		pch_i.style.display = 'none';
-		pch_t.style.display = 'none';
-	}
-							
-	to_user = new_user;
-	
-	changeChat('ou_' + to_user, to_user)
-	
-	pch_i = document.getElementById('pch_i-' + to_user);
-	pch_t = document.getElementById('pch_t-' + to_user);
-	
-	if(!!pch_i) {
+	$('.me').removeClass('messaged');	
 		
-		pch_i.style.display = 'block';
-		pch_t.style.display = 'block';
+}
 	
+function showUserChat (user){
+			
+	$('#chat').children().hide();
+
+	var pch_t = getUserChatTextArea (user);
+	
+	var pch_i = document.getElementById('pch_i-' + user);
+	
+	pch_i.style.display = 'block';
+	pch_t.style.display = 'block';
+
+	$('.vframe>a').removeClass('selected');
+	
+	$('#ou_' + u(user)).addClass('selected');
+
+	$('#ou_' + u(user)).removeClass('messaged');		
+}
+
+function getUserChatTextArea (user) {
+
+	console.log('getUserChatTextArea');
+	
+	var pch_t = document.getElementById('pch_t-' + user);
+	
+	console.log(pch_t);
+	
+	if(!!pch_t) {
+
 	} else {
-
+		  
 		var pch = document.getElementById('chat');
-
-pch_i = document.createElement('input');
+	
+		var pch_i = document.createElement('input');
 		pch_i.setAttribute('type', 'text');
-		pch_i.setAttribute('id', "pch_i-" + to_user);               
-pch.appendChild(pch_i);
+		pch_i.setAttribute('id', "pch_i-" + user);   
+		pch_i.style.display = 'none';
+		pch.appendChild(pch_i);
 		
-		var pch_t = document.createElement('Textarea');
-		pch_t.setAttribute('id', "pch_t-" + to_user);
+		pch_t = document.createElement('Textarea');
+		pch_t.setAttribute('id', "pch_t-" + user);
+		pch_t.style.display = 'none';
 		pch.appendChild(pch_t);
-	}                         
+	} 
+	
+	return pch_t;
 }
 					
 $(function(){
@@ -160,30 +204,6 @@ $(function(){
 				$("#create_room").attr('target', '_blank');
 			}
 		});
-	});
-	
-	$('#outgoingChatMessage').keypress(function(event) {
-		if(event.which == 13) {
-			event.preventDefault();
-	
-			var now = format(new Date());
-			
-			var sid = webrtc.connection.socket.sessionid;                         
-			var msg = $('#outgoingChatMessage').val();
-
-			var message = {'sent': now, 'from': USERNAME, 'room': ROOM_ID, 'message': msg};
-		
-			webrtc.connection.emit('message', message);
-			
-			console.log(message);
-			
-			var textarea = document.getElementById('incomingChatMessages');
-			var new_data = message.sent + ' > ' + message.message;
-			var total = ((textarea.value ? textarea.value + "\n" : "") + new_data).split("\n");
-			console.log(total);
-			if (total.length > CHAT_TEXTAREA_MAX_ROW) total = total.slice(total.length - CHAT_TEXTAREA_MAX_ROW);
-			textarea.value = total.join("\n");
-		}
 	});
 
 	webrtc.connection.on('userconnected', function(users) {
@@ -222,13 +242,14 @@ $(function(){
 		console.log(username);
 		if(username == USERNAME) return;
 		online_users.splice(online_users.indexOf(username), 1);
-		$('#ou_' + username.replace(/\./gi, "\\.")).css('color', 'grey');
+		$('#ou_' + u(username)).css('color', 'grey');
 	});
 	
 	webrtc.connection.on('message', function(message) {
 		
 		var new_data, textarea, total;
 		
+		//console.log('message');
 		//console.log(message);
 		
 		if(message.message) {
@@ -237,12 +258,15 @@ $(function(){
 			
 			if (message.to) {
 				if (message.to == USERNAME) {
-					showUserChat(message.from);
-					console.log('pch_t-' + to_user);
-					textarea = document.getElementById('pch_t-' + to_user);  
+					
+					$('#ou_' + u(message.from) + ':not(.messaged,.selected)').addClass('messaged');
+					
+					textarea = getUserChatTextArea(message.from); 
 				}
 			} else if (message.room == ROOM_ID || message.from == 'system') {
 				textarea = document.getElementById('incomingChatMessages');
+
+				$('.me:not(.messaged,.selected)').addClass('messaged');					
 			}
 			
 			if(textarea) {

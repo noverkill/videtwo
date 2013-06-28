@@ -1,7 +1,7 @@
 ;(function () {
 
 var logger = {
-    log: function (){console.log(arguments)},
+    log: function (){/*console.log(arguments)*/},
     warn: function (){console.log('warn: ' + arguments)},
     error: function (){console.log('error: ' + arguments)}
 };
@@ -256,9 +256,13 @@ function WebRTC(opts) {
     });
 
     connection.on('message', function (message) {
-        //console.log('message received: ' + message);
-        var existing = self.pcs[message.from];
-        if (existing) {
+        
+		//console.log('message received:');
+		//console.log(message);
+        
+		var existing = self.pcs[message.from];
+        
+		if (existing) {
             existing.handleMessage(message);
         } else {
             // create the conversation object
@@ -271,14 +275,20 @@ function WebRTC(opts) {
         }
     });
 
-    connection.on('joined', function (room) {
-        logger.log('got a joined', room);
-        if (!self.pcs[room.id]) {
-            self.startVideoCall(room.id);
+    connection.on('joined', function (details) {
+        //console.log('got a joined');
+		online_users = details.users;
+		//console.log(online_users);
+        if (!self.pcs[details.clientid]) {
+            self.startVideoCall(details.clientid);
         }
     });
-    connection.on('left', function (room) {
-        var conv = self.pcs[room.id];
+	
+    connection.on('left', function (details) {
+        //console.log('left');
+		online_users = details.users;
+		//console.log(online_users);		
+        var conv = self.pcs[details.id];
         if (conv) conv.handleStreamRemoved();
     });
 
@@ -315,6 +325,7 @@ WebRTC.prototype.getLocalVideoContainer = function () {
     if (el && el.tagName === 'VIDEO') {
         return el;
     } else {
+		
 		var vframe = document.createElement('span');
 		vframe.setAttribute('class', 'vframe');		
 		
@@ -322,10 +333,8 @@ WebRTC.prototype.getLocalVideoContainer = function () {
 		userv.setAttribute('id', 'ou_' + USERNAME);
 		userv.setAttribute('class', 'me');
 		userv.setAttribute('onclick', 'showRoomChat()');
-		userv.innerHTML = USERNAME;
 					
-		var video = document.createElement('video');
-		//var video = document.createElement('div');        
+		var video = document.createElement('video');      
         video.setAttribute('class', 'local_video');
         
         vframe.appendChild(video);
@@ -357,13 +366,15 @@ WebRTC.prototype.createRoom = function (name, cb) {
     }
 };
 
-WebRTC.prototype.joinRoom = function (name) {
-    this.connection.emit('join', name);
-    this.roomName = name;
+WebRTC.prototype.joinRoom = function (room_name, user_name) {
+    this.connection.emit('join', room_name, user_name);
+    this.roomName = room_name;
 };
 
 WebRTC.prototype.leaveRoom = function () {
     if (this.roomName) {
+		console.log('leave');
+		console.log(this.id);
         this.connection.emit('leave', this.roomName);
         for (var pc in this.pcs) {
             this.pcs[pc].end();
@@ -445,7 +456,7 @@ Conversation.prototype.handleMessage = function (message) {
     } else if (message.type === 'answer') {
         this.pc.setRemoteDescription(new RTCSessionDescription(message.payload));
     } else if (message.type === 'candidate') {
-        console.log('message.payload', message.payload);
+        //console.log('message.payload', message.payload);
         var candidate = new RTCIceCandidate({
             sdpMLineIndex: message.payload.label,
             candidate: message.payload.candidate
@@ -475,6 +486,7 @@ Conversation.prototype.start = function () {
     var self = this;
     this.pc.createOffer(function (sessionDescription) {
         logger.log('setting local description');
+		sessionDescription.username = USERNAME;
         self.pc.setLocalDescription(sessionDescription);
         logger.log('sending offer', sessionDescription);
         self.send('offer', sessionDescription);
@@ -498,11 +510,18 @@ Conversation.prototype.answer = function () {
 };
 
 Conversation.prototype.handleRemoteStreamAdded = function (event) {
-    
-	console.log('handleRemoteStreamAdded');
-	console.log(this.id);
+	
+	//console.log('handleRemoteStreamAdded');
+	//console.log(online_users);
+	
+	var username;
 
-	var username = online_users[online_clients.indexOf(this.id)];
+    for (var i = 0; i < online_users.length; i++) {
+        if (online_users[i]['id'] == this.id) {
+            username = online_users[i]['name'];
+			break;
+        }
+    }
 	
 	var stream = this.stream = event.stream;
 
@@ -526,12 +545,6 @@ Conversation.prototype.handleRemoteStreamAdded = function (event) {
 		
 	var container = this.parent.getRemoteVideoContainer();
     
-	console.log('container');
-	console.log(container);	
-	
-	console.log('el');
-	console.log(el);
-	
     if (container) container.appendChild(el);
 	
     this.emit('videoAdded', el);

@@ -32,6 +32,7 @@ io.sockets.on('connection', function (client) {
         var otherClient = io.sockets.sockets[details.to];
 
         if (!otherClient) {
+			client.broadcast.emit('message', details);
             return;
         }
         delete details.to;

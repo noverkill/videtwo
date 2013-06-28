@@ -27,6 +27,10 @@ ul {
 	list-style-type: none;
 }
 
+.selected {
+	text-decoration: underline;
+}
+
 #wrapper {
 	min-height: 100%;
 	position: relative;
@@ -126,6 +130,11 @@ ul {
 	color: orange;
 }
 
+.messaged {
+	padding: 20px !important;
+	background: url('orange_dot.gif') center right no-repeat !important;
+}
+
 .remote_video, .local_video {
 	width: 17.25em; /*11.5em;*/           
 	height: 13.05em; /*8.7em;*/
@@ -166,6 +175,15 @@ ul {
 	border:0;			
 }
 
+#incomingChatMessages {
+	background-color: #fff !important;
+	border: 1px solid black !important;
+}
+
+#outgoingChatMessage {
+	background-color: #ccc !important;
+}
+
 @media screen and (min-width: 40.5em) {
 	#top_strip > * {
 		min-width: 0;
@@ -184,7 +202,7 @@ ul {
 	}
 
 	#chat > input {
-		border: 0.1em;
+		/*border: 0.1em;*/
 		font-size: 0.9em;
 	}	
 }
