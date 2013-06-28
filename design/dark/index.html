@@ -3,16 +3,17 @@
 
   <head>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>      
-    <script src="<?php echo $DOMAIN; ?>/webrtc.js"></script>
-    <script src="<?php echo $DOMAIN; ?>/socket.io.js"></script>            
+    <script src="{$DOMAIN}/webrtc.js"></script>
+    <script src="{$DOMAIN}/socket.io.js"></script>            
     <script> 
-        URL = "<?php echo $URL; ?>"; 					
-        USERNAME = "<?php echo $_SESSION['username']; ?>";
-        ROOM_ID = "<?php echo $ROOM_ID; ?>"
+        URL = "{$URL}"; 					
+        USERNAME = "{$user_nick}";
+        ROOM_ID = "{$room_name}"
         CHAT_TEXTAREA_MAX_ROW = 20; //how many rows go into the texarea before it starts to scroll up
 		
 		
     </script>	
+	<script src="{$DOMAIN}/jscript.js"></script>
     
     <meta charset="utf-8">
     <title>New Chat</title>
@@ -28,6 +29,76 @@
     
 	<link href="design/dark/css/dark.css" rel="stylesheet">
     <style>
+#remoteVideos {
+	display: block;
+	width: 100%;
+	max-width: 36.7em;
+	margin-left: auto;
+	margin-right:auto;
+}
+
+.vframe {
+	float:left;
+	width: 17.25em; /*11.5em;*/           
+	height: 15em; /*10.4em;*/
+    background-color: #eee;
+	-moz-box-shadow: 0 0 5px #fff;
+	-webkit-box-shadow: 0 0 5px #fff;
+	box-shadow: 0 0 5px #ccc;
+	margin: 0.25em;
+	padding: 0.11em;	
+	text-align: center;	
+}
+
+.vframe > a {
+	color: #000;
+	cursor: pointer;
+}
+.vframe > a.me {
+	color: #3574C6;
+}
+
+.vframe > a > span {
+	color: orange;
+}
+
+.messaged {
+	padding: 20px !important;
+	background: url('orange_dot.gif') center right no-repeat !important;
+}
+
+.selected {
+	text-decoration: underline !important;
+}
+
+.remote_video, .local_video {
+	width: 17.25em;           
+	height: 13.05em;
+}
+
+#chat {
+	display: block;
+	width: 100%;
+	max-width: 36.3em;
+	margin-left: auto;
+	margin-right:auto;
+}
+
+#chat > input {
+	width: 100%;
+	float: left;
+	margin: 0.2em 0;
+	font-size: 1.5em;
+}	
+
+#chat > textarea {
+	width: 100%;
+	height: 15em;
+	float: left;
+	margin: 0.2em 0;	
+	background-color: #CCC;		
+	border:0;			
+}
 
     </style>
 
@@ -97,8 +168,18 @@
         </div>
         
        
-        <div class="text-chat"><h1 class="big">text</h1></div>
-        <div class="video-chat "><h1 class="big">video</h1></div>
+        <div class="text-chat">
+			<h1 class="big">text</h1>
+			<div id="chat">
+				<h3>Initializing... Please wait!</h3>
+				<input type="text" id="outgoingChatMessage" style="display:none" />
+				<textarea id="incomingChatMessages" style="display:none"></textarea>
+			</div>
+		</div>
+        <div class="video-chat ">
+			<h1 class="big">video</h1>
+			<div id="remoteVideos"></div>
+		</div>
 
 </div>
 
@@ -113,7 +194,7 @@
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="js/bootstrap.min.js"></script>
+    <script src="./design/dark/js/bootstrap.min.js"></script>
 
     <script>
 		var page = document.getElementById('page'),

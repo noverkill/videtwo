@@ -14,53 +14,34 @@
     }
 	
     $ROOM_ID = isset($_GET['room']) ? $_GET['room'] : 'lobby';
+	
+	
+	// template engine configurations
+	require "library/Rain/autoload.php";
+	
+	// namespace
+	use Rain\Tpl;
+	
+	// config
+	$config = array(
+	"tpl_dir"       => "design/dark/",
+	"cache_dir"     => "cache/",
+	"debug"         => true, // set to false to improve the speed
+	);
+
+	Tpl::configure( $config );
+
+	// create the Tpl object
+    $tpl = new Tpl;
+
+    // assign variables
+    $tpl->assign("DOMAIN", $DOMAIN);
+    $tpl->assign("URL", $URL);
+    $tpl->assign("site_title", "New Chat" );
+	$tpl->assign("user_nick", $_SESSION['username']);
+	$tpl->assign("room_name", $ROOM_ID); 
+
+    // draw the template
+    $tpl->draw( "index" );
+
 ?>
-<!DOCTYPE html>
-<html>
-    <head>
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<link rel="stylesheet" type="text/css" href="/style.css?<?php echo microtime(1); ?>" media="screen" />
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>      
-		<script src="<?php echo $DOMAIN; ?>/webrtc.js"></script>
-		<script src="<?php echo $DOMAIN; ?>/socket.io.js"></script>            
-		<script> 
-			URL = "<?php echo $URL; ?>"; 					
-			USERNAME = "<?php echo $_SESSION['username']; ?>";
-			ROOM_ID = "<?php echo $ROOM_ID; ?>"
-			CHAT_TEXTAREA_MAX_ROW = 12; //how many rows go into the textarea before it starts to scroll up
-		</script>			
-		<script src="jscript.js?<?php echo microtime(1); ?>"></script>
-    </head>
-    <body>       
-		<div id="top_stripe">
-			<span>Welcome: <?php print $_SESSION['username']; ?></span> 
-			<span id="curr_room">You are in room: <?php echo $ROOM_ID; ?></span>
-			<a id="create_room" href="#">Create room</a>
-			<a href="?logout">Logout</a>
-		</div>
-		<br class="clear" />
-		<div id="remoteVideos"></div>
-		<br class="clear" />
-		<div id="bottom_stripe">
-			<div id="chat" style="display:none">
-				<p>Text Chat</p>
-				<input type="text" id="outgoingChatMessage" />
-				<textarea id="incomingChatMessages"></textarea>
-			</div>
-			<br class="clear" />
-			<div>
-				<p><a id="cstatus">Connecting to chat...</a></p>
-				<ul id="online_users">
-					<?php
-						$users = scandir('/var/www/users/');
-						foreach($users as $user) {
-							if($user != '.' && $user != '..' && $user != '.gitignore') {
-								print "<li><a id='ou_" . $user . "' onclick='showUserChat(\"$user\")'>$user</a></li>";
-							}
-						}
-					?>
-				</ul>
-			</div>                
-		</div>      
-    </body>
-</html>
