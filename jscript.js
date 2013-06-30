@@ -1,9 +1,4 @@
 var online_users = [];
-
-var current_chat_id = null;
-var current_chat_text;
-
-var to_user;
 												
 format = function(date){
 	var dd=date.getDate();
@@ -24,7 +19,7 @@ format = function(date){
 }
 
 //escape usernames before use with jQuery id selector
-//(because the dot in the username create problems)
+//(because the dot in the username creates problems)
 u = function (n) {
 	return n.replace(/\./gi, "\\.");
 }
@@ -41,40 +36,26 @@ webrtc.on('readyToCall', function () {
 		 
 	$('.me').html(USERNAME);
 	
-	$('#chat').show();
-	
 	showRoomChat();
 	
 	webrtc.joinRoom(ROOM_ID, USERNAME);
 });
-				  
+	
 $(document).keypress(function(event) {
 	
 	if(event.which == 13) {
-		
-		console.log('keypress');
-		
+				
 		event.preventDefault();                                              
 		
-		//console.log(event.target.id);
-		
 		var tid = event.target.id.split('-');
-
-		console.log(tid);
-		
-		//console.log(tid[0]);
 		
 		if(tid[0] == 'pch_i') {
 			
 			var to_user = tid[1];
 			
-			//console.log(to_user);
-			
 			var now = format(new Date());
 			
 			var sid = webrtc.connection.socket.sessionid;                         
-			
-			//console.log(event.target);
 		
 			var msg = event.target.value;
 			
@@ -84,19 +65,13 @@ $(document).keypress(function(event) {
 		
 			webrtc.connection.emit('message', message);
 			
-			console.log(message);
-			
 			var textarea = getUserChatTextArea(to_user); 
-			
-			console.log(textarea);
 			
 			var new_data = now + '(to:' + to_user + ')>' + msg;
 			
 			var new_data = now + ' me > ' + msg;
 			
 			var total = ((textarea.value ? textarea.value + "\n" : "") + new_data).split("\n");
-			
-			console.log(total);
 			
 			if (total.length > CHAT_TEXTAREA_MAX_ROW) total = total.slice(total.length - CHAT_TEXTAREA_MAX_ROW);
 			
@@ -118,12 +93,11 @@ $(document).keypress(function(event) {
 		
 			webrtc.connection.emit('message', message);
 			
-			//console.log(message);
+			console.log(message);
 			
 			var textarea = document.getElementById('incomingChatMessages');
 			var new_data = message.sent + ' > ' + message.message;
 			var total = ((textarea.value ? textarea.value + "\n" : "") + new_data).split("\n");
-			console.log(total);
 			if (total.length > CHAT_TEXTAREA_MAX_ROW) total = total.slice(total.length - CHAT_TEXTAREA_MAX_ROW);
 			textarea.value = total.join("\n");
 		}
@@ -165,11 +139,11 @@ function showUserChat (user){
 
 function getUserChatTextArea (user) {
 
-	console.log('getUserChatTextArea');
+	//console.log('getUserChatTextArea');
 	
 	var pch_t = document.getElementById('pch_t-' + user);
 	
-	console.log(pch_t);
+	//console.log(pch_t);
 	
 	if(!!pch_t) {
 
@@ -193,9 +167,14 @@ function getUserChatTextArea (user) {
 }
 					
 $(function(){
+	
+	$('#start-video').click(function(){
+		console.log('start-video');
+		webrtc.startLocalVideo();
+	})
 	 
 	$("#create_room").click(function(){
-		console.log("create_room");
+		//console.log("create_room");
 		$.get("create_room.php", function(data, status) {
 			if(status=="success") {
 				//console.log("Data: " + data + "\nStatus: " + status);
@@ -204,45 +183,6 @@ $(function(){
 				$("#create_room").attr('target', '_blank');
 			}
 		});
-	});
-
-	webrtc.connection.on('userconnected', function(users) {
-		console.log('userconnected');
-		console.log(users);
-		for (var i in users) {
-			
-			username = users[i];
-			
-			if(username == USERNAME) continue;
-
-			if(online_users.indexOf(username)>-1) continue;
-			
-			online_users.push(username);
-										
-			if(document.getElementById('ou_' + username) !== null) {
-				document.getElementById('ou_' + username).style.color = "green";
-				continue;
-			}
-
-			var ul = document.getElementById('online_users');
-			var li = document.createElement('li');
-			var a = document.createElement('a');
-			//a.setAttribute('href', '#');
-			a.setAttribute('id', 'ou_' + username);
-			a.setAttribute('onclick', "showUserChat('"+username+"')");
-			a.innerHTML = username;
-			console.log(a);
-			li.appendChild(a);
-			ul.appendChild(li);
-		}
-	});
-	
-	webrtc.connection.on('userdeleted', function(username) {
-		console.log('userdeleted');
-		console.log(username);
-		if(username == USERNAME) return;
-		online_users.splice(online_users.indexOf(username), 1);
-		$('#ou_' + u(username)).css('color', 'grey');
 	});
 	
 	webrtc.connection.on('message', function(message) {
@@ -275,10 +215,5 @@ $(function(){
 				textarea.value = total.join("\n");
 			}
 		}
-	});
-
-	webrtc.connection.on('connect', function() {
-		webrtc.connection.emit('adduser', USERNAME);
-	});
-							
+	});							
 });

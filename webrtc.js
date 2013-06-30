@@ -222,7 +222,10 @@ function WebRTC(opts) {
             media: {
                 audio:true,
                 video: {
-                    mandatory: {},
+                    mandatory: {
+						maxWidth: 320,
+						maxHeight: 240
+					},
                     optional: []
                 }
             }
@@ -336,6 +339,7 @@ WebRTC.prototype.getLocalVideoContainer = function () {
 					
 		var video = document.createElement('video');      
         video.setAttribute('class', 'local_video');
+        video.setAttribute('muted', 'true');
         
         vframe.appendChild(video);
         vframe.appendChild(userv);
@@ -373,8 +377,8 @@ WebRTC.prototype.joinRoom = function (room_name, user_name) {
 
 WebRTC.prototype.leaveRoom = function () {
     if (this.roomName) {
-		console.log('leave');
-		console.log(this.id);
+		//console.log('leave');
+		//console.log(this.id);
         this.connection.emit('leave', this.roomName);
         for (var pc in this.pcs) {
             this.pcs[pc].end();
