@@ -46,7 +46,7 @@
 	<div id="container">
         <div id="icons">
             <div id="auth-facebook">
-                <a id="facebook-logo" href="{$loginFacebook"></a>
+                <a id="facebook-logo" href="<?php echo htmlspecialchars( $loginFacebook, ENT_COMPAT, 'UTF-8', FALSE ); ?>"></a>
             </div>
                 
             <div id="auth-twitter" >    

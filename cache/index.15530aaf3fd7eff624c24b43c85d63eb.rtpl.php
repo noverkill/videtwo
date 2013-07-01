@@ -3,16 +3,17 @@
 
   <head>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>      
-    <script src="&lt;?php echo $DOMAIN; ?&gt;/webrtc.js"></script>
-    <script src="&lt;?php echo $DOMAIN; ?&gt;/socket.io.js"></script>            
+    <script src="<?php echo htmlspecialchars( $DOMAIN, ENT_COMPAT, 'UTF-8', FALSE ); ?>/webrtc.js"></script>
+    <script src="<?php echo htmlspecialchars( $DOMAIN, ENT_COMPAT, 'UTF-8', FALSE ); ?>/socket.io.js"></script>            
     <script> 
-        URL = "&lt;?php echo $URL; ?&gt;"; 					
-        USERNAME = "&lt;?php echo $_SESSION['username']; ?&gt;";
-        ROOM_ID = "&lt;?php echo $ROOM_ID; ?&gt;"
+        URL = "<?php echo htmlspecialchars( $URL, ENT_COMPAT, 'UTF-8', FALSE ); ?>"; 					
+        USERNAME = "<?php echo htmlspecialchars( $user_nick, ENT_COMPAT, 'UTF-8', FALSE ); ?>";
+        ROOM_ID = "<?php echo htmlspecialchars( $room_name, ENT_COMPAT, 'UTF-8', FALSE ); ?>"
         CHAT_TEXTAREA_MAX_ROW = 20; //how many rows go into the texarea before it starts to scroll up
 		
 		
     </script>	
+	<script src="<?php echo htmlspecialchars( $DOMAIN, ENT_COMPAT, 'UTF-8', FALSE ); ?>/jscript.js"></script>
     
     <meta charset="utf-8">
     <title>New Chat</title>
@@ -28,6 +29,76 @@
     
 	<link href="design/dark/css/dark.css" rel="stylesheet">
     <style>
+#remoteVideos {
+	display: block;
+	width: 100%;
+	max-width: 36.7em;
+	margin-left: auto;
+	margin-right:auto;
+}
+
+.vframe {
+	float:left;
+	width: 17.25em; /*11.5em;*/           
+	height: 15em; /*10.4em;*/
+    background-color: #eee;
+	-moz-box-shadow: 0 0 5px #fff;
+	-webkit-box-shadow: 0 0 5px #fff;
+	box-shadow: 0 0 5px #ccc;
+	margin: 0.25em;
+	padding: 0.11em;	
+	text-align: center;	
+}
+
+.vframe > a {
+	color: #000;
+	cursor: pointer;
+}
+.vframe > a.me {
+	color: #3574C6;
+}
+
+.vframe > a > span {
+	color: orange;
+}
+
+.messaged {
+	padding: 20px !important;
+	background: url('orange_dot.gif') center right no-repeat !important;
+}
+
+.selected {
+	text-decoration: underline !important;
+}
+
+.remote_video, .local_video {
+	width: 17.25em;           
+	height: 13.05em;
+}
+
+#chat {
+	display: block;
+	width: 100%;
+	max-width: 36.3em;
+	margin-left: auto;
+	margin-right:auto;
+}
+
+#chat > input {
+	width: 100%;
+	float: left;
+	margin: 0.2em 0;
+	font-size: 1.5em;
+}	
+
+#chat > textarea {
+	width: 100%;
+	height: 15em;
+	float: left;
+	margin: 0.2em 0;	
+	background-color: #CCC;		
+	border:0;			
+}
 
     </style>
 
@@ -84,6 +155,7 @@
         </div>
          <div class="controls">
             <p>
+                <button id="start-video">Start video</button>
                 <button id="view-fullscreen">Fullscreen</button>
                 <button id="cancel-fullscreen">Cancel fullscreen</button>
             </p>
@@ -94,8 +166,18 @@
         </div>
         
        
-        <div class="text-chat"><h1 class="big">text</h1></div>
-        <div class="video-chat "><h1 class="big">video</h1></div>
+        <div class="text-chat">
+			<h1 class="big">text</h1>
+			<div id="chat">
+				<h3>Initializing... Please wait!</h3>
+				<input type="text" id="outgoingChatMessage" style="display:none" />
+				<textarea id="incomingChatMessages" style="display:none"></textarea>
+			</div>
+		</div>
+        <div class="video-chat ">
+			<h1 class="big">video</h1>
+			<div id="remoteVideos"></div>
+		</div>
 
 </div>
 
@@ -109,7 +191,7 @@
 
     
     
-    <script src="js/bootstrap.min.js"></script>
+    <script src="./design/dark/js/bootstrap.min.js"></script>
 
     <script>
 		var page = document.getElementById('page'),
