@@ -339,7 +339,9 @@ WebRTC.prototype.getLocalVideoContainer = function () {
 					
 		var video = document.createElement('video');      
         video.setAttribute('class', 'local_video');
-        video.setAttribute('muted', 'true');
+        //video.setAttribute('muted', 'true');
+        video.muted = 'true';
+        //video.setAttribute('controls', 'true');
         
         vframe.appendChild(video);
         vframe.appendChild(userv);
