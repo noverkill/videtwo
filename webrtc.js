@@ -250,7 +250,7 @@ function WebRTC(opts) {
     this.pcs = {};
 
     // our socket.io connection
-    connection = this.connection = io.connect(this.config.url);
+    connection = this.connection = socket; //io.connect(this.config.url);
 
     connection.on('connect', function () {
         self.emit('ready', connection.socket.sessionid);

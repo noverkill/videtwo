@@ -37,6 +37,7 @@
     // assign variables
     $tpl->assign("DOMAIN", $DOMAIN);
     $tpl->assign("URL", $URL);
+	$tpl->assign("MICROTIME", microtime(1)); 	
     $tpl->assign("site_title", "New Chat" );
 	$tpl->assign("user_nick", $_SESSION['username']);
 	$tpl->assign("room_name", $ROOM_ID); 

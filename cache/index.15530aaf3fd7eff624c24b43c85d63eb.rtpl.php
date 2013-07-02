@@ -3,17 +3,56 @@
 
   <head>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>      
-    <script src="<?php echo htmlspecialchars( $DOMAIN, ENT_COMPAT, 'UTF-8', FALSE ); ?>/webrtc.js"></script>
+    <script src="<?php echo htmlspecialchars( $DOMAIN, ENT_COMPAT, 'UTF-8', FALSE ); ?>/webrtc.js?<?php echo htmlspecialchars( $MICROTIME, ENT_COMPAT, 'UTF-8', FALSE ); ?>"></script>
     <script src="<?php echo htmlspecialchars( $DOMAIN, ENT_COMPAT, 'UTF-8', FALSE ); ?>/socket.io.js"></script>            
     <script> 
         URL = "<?php echo htmlspecialchars( $URL, ENT_COMPAT, 'UTF-8', FALSE ); ?>"; 					
         USERNAME = "<?php echo htmlspecialchars( $user_nick, ENT_COMPAT, 'UTF-8', FALSE ); ?>";
         ROOM_ID = "<?php echo htmlspecialchars( $room_name, ENT_COMPAT, 'UTF-8', FALSE ); ?>"
-        CHAT_TEXTAREA_MAX_ROW = 20; //how many rows go into the texarea before it starts to scroll up
-		
-		
+        CHAT_TEXTAREA_MAX_ROW = 20; //how many rows go into the texarea before it starts to scroll up		
     </script>	
-	<script src="<?php echo htmlspecialchars( $DOMAIN, ENT_COMPAT, 'UTF-8', FALSE ); ?>/jscript.js"></script>
+	<script>
+		var socket = io.connect('http://videtwo.com:8080');
+
+		// on connection to server, ask for user's name with an anonymous callback
+		socket.on('connect', function(){
+			// call the server-side function 'adduser' and send one parameter (value of prompt)
+			socket.emit('adduser', USERNAME /*prompt("What's your name?")*/);
+		});
+
+		// listener, whenever the server emits 'updatechat', this updates the chat body
+		socket.on('updatechat', function (username, data) {
+			$('#conversation').append('<b>'+username + ':</b> ' + data + '<br>');
+		});
+
+		// listener, whenever the server emits 'updateusers', this updates the username list
+		socket.on('updateusers', function(data) {
+			$('#users').empty();
+			$.each(data, function(key, value) {
+				$('#users').append('<div>' + key + '</div>');
+			});
+		});
+
+		// on load of page
+		$(function(){
+			// when the client clicks SEND
+			$('#datasend').click( function() {
+				var message = $('#data').val();
+				$('#data').val('');
+				// tell server to execute 'sendchat' and send along one parameter
+				socket.emit('sendchat', message);
+			});
+
+			// when the client hits ENTER on their keyboard
+			$('#data').keypress(function(e) {
+				if(e.which == 13) {
+					$(this).blur();
+					$('#datasend').focus().click();
+				}
+			});
+		});
+	</script>	
+	<script src="<?php echo htmlspecialchars( $DOMAIN, ENT_COMPAT, 'UTF-8', FALSE ); ?>/jscript.js?<?php echo htmlspecialchars( $MICROTIME, ENT_COMPAT, 'UTF-8', FALSE ); ?>"></script>
     
     <meta charset="utf-8">
     <title>New Chat</title>
@@ -27,7 +66,7 @@
 
     
     
-	<link href="design/dark/css/dark.css" rel="stylesheet">
+	<link href="design/dark/css/dark.css?<?php echo htmlspecialchars( $MICROTIME, ENT_COMPAT, 'UTF-8', FALSE ); ?>" rel="stylesheet">
     <style>
 #remoteVideos {
 	display: block;
@@ -167,13 +206,22 @@
         
        
         <div class="text-chat">
-			<h1 class="big">text</h1>
-			<div id="chat">
-				<h3>Initializing... Please wait!</h3>
-				<input type="text" id="outgoingChatMessage" style="display:none" />
-				<textarea id="incomingChatMessages" style="display:none"></textarea>
-			</div>
+
+			<b>Online users</b>
+			<div id="users"></div>
+	
+			
+			
+			<br />
+			<br />
+			
+			<div id="conversation"></div>
+			<input id="data" style="width:200px;" />
+			<input type="button" id="datasend" value="send" />			
+			
+			
 		</div>
+		
         <div class="video-chat ">
 			<h1 class="big">video</h1>
 			<div id="remoteVideos"></div>

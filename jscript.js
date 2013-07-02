@@ -28,7 +28,7 @@ var webrtc = new WebRTC({
 	localVideoEl: 'remoteVideos',
 	remoteVideosEl: 'remoteVideos',
 	// immediately ask for camera access
-	autoRequestMedia: true
+	autoRequestMedia: false
 });
 
 // we have to wait until it's ready
@@ -36,11 +36,12 @@ webrtc.on('readyToCall', function () {
 		 
 	$('.me').html(USERNAME);
 	
-	showRoomChat();
+	//showRoomChat();
 	
 	webrtc.joinRoom(ROOM_ID, USERNAME);
 });
-	
+
+/*	
 $(document).keypress(function(event) {
 	
 	if(event.which == 13) {
@@ -103,7 +104,9 @@ $(document).keypress(function(event) {
 		}
 	}
 });
+*/
 
+/*
 function showRoomChat(){
 	
 	$('#chat').children().hide();
@@ -118,7 +121,8 @@ function showRoomChat(){
 	$('.me').removeClass('messaged');	
 		
 }
-	
+*/
+
 function showUserChat (user){
 			
 	$('#chat').children().hide();
@@ -169,7 +173,8 @@ function getUserChatTextArea (user) {
 $(function(){
 	
 	$('#start-video').click(function(){
-		console.log('start-video');
+		//console.log('start-video');
+		$('#start-video').attr("disabled", true);
 		webrtc.startLocalVideo();
 	})
 	 
