@@ -22,12 +22,13 @@
     $tpl = new Tpl;
 
     // assign variables
+	
+	$tpl->assign("DOMAIN", $DOMAIN);
+	$tpl->assign("MICROTIME", microtime(1)); 	
+	
     $tpl->assign("loginFacebook", $DOMAIN.'/facebook.php' );
     $tpl->assign("loginTwitter", $DOMAIN.'/twitter.php' );
     $tpl->assign("loginGoogle", $DOMAIN.'/google.php' );
-
-
-
 
     // draw the template
     $tpl->draw( "login" );

@@ -1,3 +1,45 @@
+
+var socket = io.connect('http://videtwo.com:8080');
+
+// on connection to server, ask for user's name with an anonymous callback
+socket.on('connect', function(){
+	// call the server-side function 'adduser' and send one parameter (value of prompt)
+	socket.emit('adduser', USERNAME /*prompt("What's your name?")*/);
+});
+
+// listener, whenever the server emits 'updatechat', this updates the chat body
+socket.on('updatechat', function (username, data) {
+	//console.log('updatechat');
+	
+	$('#conversation').append('<b>'+username + ':</b> ' + data + '<br>');
+	
+	var msg = username + ': ' + data;
+	
+	var textarea = document.getElementById('incomingChatMessages');
+	
+	//console.log(textarea);
+	
+	var total = ((textarea.value ? textarea.value + "\n" : "") + msg).split("\n");
+			
+	if (total.length > CHAT_TEXTAREA_MAX_ROW) total = total.slice(total.length - CHAT_TEXTAREA_MAX_ROW);
+			
+	textarea.value = total.join("\n");
+});
+
+// listener, whenever the server emits 'updateusers', this updates the username list
+socket.on('updateusers', function(data) {
+	$('#users').empty();
+	$.each(data, function(key, value) {
+		//$('#users').append('<div>' + key + '</div>');
+		$('#users').append('<span class="user" style="margin: 0 5px">' + key +  '<span>');
+	});
+});
+
+
+
+
+
+
 var online_users = [];
 												
 format = function(date){
@@ -28,7 +70,7 @@ var webrtc = new WebRTC({
 	localVideoEl: 'remoteVideos',
 	remoteVideosEl: 'remoteVideos',
 	// immediately ask for camera access
-	autoRequestMedia: false
+	//autoRequestMedia: false
 });
 
 // we have to wait until it's ready
@@ -171,6 +213,15 @@ function getUserChatTextArea (user) {
 }
 					
 $(function(){
+
+	$('#outgoingChatMessage').keypress(function(e) {
+		if(e.which == 13) {
+			$(this).blur();
+			var message = $(this).val();
+			$(this).val('');
+			socket.emit('sendchat', message);
+		}
+	});
 	
 	$('#start-video').click(function(){
 		//console.log('start-video');

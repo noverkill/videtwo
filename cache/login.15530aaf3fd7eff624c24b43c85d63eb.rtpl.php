@@ -3,16 +3,8 @@
 
   <head>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>      
-    <script src="&lt;?php echo $DOMAIN; ?&gt;/webrtc.js"></script>
-    <script src="&lt;?php echo $DOMAIN; ?&gt;/socket.io.js"></script>            
-    <script> 
-        URL = "&lt;?php echo $URL; ?&gt;"; 					
-        USERNAME = "&lt;?php echo $_SESSION['username']; ?&gt;";
-        ROOM_ID = "&lt;?php echo $ROOM_ID; ?&gt;"
-        CHAT_TEXTAREA_MAX_ROW = 20; //how many rows go into the texarea before it starts to scroll up
-		
-		
-    </script>	
+    <script src="<?php echo htmlspecialchars( $DOMAIN, ENT_COMPAT, 'UTF-8', FALSE ); ?>/webrtc.js?<?php echo htmlspecialchars( $MICROTIME, ENT_COMPAT, 'UTF-8', FALSE ); ?>"></script>
+    <script src="<?php echo htmlspecialchars( $DOMAIN, ENT_COMPAT, 'UTF-8', FALSE ); ?>/socket.io.js"></script>            
     
     <meta charset="utf-8">
     <title>New Chat</title>
@@ -20,13 +12,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
     
-
-
-
-
     
     
-	<link href="design/auth.css" rel="stylesheet">
+	<link href="design/auth.css?<?php echo htmlspecialchars( $MICROTIME, ENT_COMPAT, 'UTF-8', FALSE ); ?>" rel="stylesheet">
     <style>
 
     </style>
@@ -40,6 +28,7 @@
 
 <body id="page">
 	<div id="logo"></div>
+    <p id="tagline">text, audio & video chat</p>
 <div id="header">
 	<span id="txt01">	login with</span>
 </div>
@@ -72,7 +61,7 @@
 
     
     
-    <script src="js/bootstrap.min.js"></script>
+    <script src="design/dark/js/bootstrap.min.js"></script>
 
     <script>
 		var page = document.getElementById('page'),
@@ -131,6 +120,6 @@
 	
 	<script src="../assets/js/holder/holder.js"></script>
     
-    <script src="js/base.js"></script>
+    <script src="design/dark/js/base.js"></script>
   </body>
 </html>
