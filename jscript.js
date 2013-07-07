@@ -1,64 +1,9 @@
 
-var socket = io.connect('http://videtwo.com:8080');
-
-// on connection to server, ask for user's name with an anonymous callback
-socket.on('connect', function(){
-	// call the server-side function 'adduser' and send one parameter (value of prompt)
-	console.log('adduser ' + USERNAME);
-	socket.emit('adduser', USERNAME /*prompt("What's your name?")*/);
-});
-
-// listener, whenever the server emits 'updatechat', this updates the chat body
-socket.on('updatechat', function (username, data) {
-	//console.log('updatechat');
-	
-	$('#conversation').append('<b>'+username + ':</b> ' + data + '<br>');
-	
-	var msg = username + ': ' + data;
-	
-	var textarea = document.getElementById('incomingChatMessages');
-	
-	//console.log(textarea);
-	
-	var total = ((textarea.value ? textarea.value + "\n" : "") + msg).split("\n");
-			
-	if (total.length > CHAT_TEXTAREA_MAX_ROW) total = total.slice(total.length - CHAT_TEXTAREA_MAX_ROW);
-			
-	textarea.value = total.join("\n");
-});
-
-// listener, whenever the server emits 'updateusers', this updates the username list
-socket.on('updateusers', function(data) {
-	$('#users').empty();
-	$.each(data, function(key, value) {
-		//$('#users').append('<div>' + key + '</div>');
-		$('#users').append('<span class="user" style="margin: 0 5px">' + key +  '<span>');
-	});
-});
-
-// listener, whenever the server emits 'updaterooms', this updates the room the client is in
-socket.on('updaterooms', function(rooms, current_room) {
-	$('#rooms').empty();
-	$('#rooms').append('<option>Switch room</option>');
-	$.each(rooms, function(key, value) {
-		$('#rooms').append('<option>' + value + '</option>');
-		/*
-		if(value == current_room){
-			$('#rooms').append('<option>' + value + '</option>');
-		}
-		else {
-			$('#rooms').append('<div><a href="#" onclick="switchRoom(\''+value+'\')">' + value + '</a></div>');
-		}
-		*/
-	});
-});
-
-function switchRoom(room){
-	socket.emit('switchRoom', room);
-}
-
-var online_users = [];
-												
+var usernames = [];
+var usercolors = [];
+		
+var room_users = [];
+		
 format = function(date){
 	var dd=date.getDate();
 
@@ -81,6 +26,104 @@ format = function(date){
 //(because the dot in the username creates problems)
 u = function (n) {
 	return n.replace(/\./gi, "\\.");
+}
+	
+var socket = io.connect('http://videtwo.com:8080');
+
+// on connection to server, ask for user's name with an anonymous callback
+socket.on('connect', function(){
+	// call the server-side function 'adduser' and send one parameter (value of prompt)
+	console.log('adduser ' + USERNAME);
+	socket.emit('adduser', USERNAME /*prompt("What's your name?")*/);
+});
+
+// listener, whenever the server emits 'updatechat', this updates the chat body
+socket.on('updatechat', function (username, data, history) {
+	
+	/*
+	console.log('updatechat');
+	console.log(username);
+	console.log(data);
+	console.log(history);
+	*/
+	
+	if(history && history.length) {
+	    $('#incomingChatMessages').empty();
+		$.each(history, function(key, value) {
+			if(value.author != 'SERVER') {
+				addToChat(value.author, value);
+			}
+		});
+	}
+	
+	if(username != 'SERVER') addToChat(username, data);
+});
+
+// listener, whenever the server emits 'updateusers', this updates the username list
+socket.on('updateusers', function(unames, ucolors) {
+	usernames = unames;	
+	usercolors = ucolors;
+	
+	$('#users').empty();
+	
+	$('#users').append('<span style="color: white">Logged in users: </span>');
+	
+	for(var i in usernames) {
+		$('#users').append('<span class="user" style="margin: 0 5px; color:' + usercolors[i] + ';">' + usernames[i] +  '<span>');
+	}
+});
+
+socket.on('room_users', function(rusers, room) {
+	console.log('room_users');
+
+	room_users = rusers;
+	
+	console.log(room_users);
+
+	$('#room_users').empty();
+	
+	$('#room_users').append('<span style="color: white">Users in room ' + room + ': </span>');
+	
+	for(var i in room_users) {
+		$('#room_users').append('<span class="user" style="margin: 0 5px; color:' + usercolors[room_users[i]] + ';">' + room_users[i] +  '<span>');
+	}
+});
+
+// listener, whenever the server emits 'updaterooms', this updates the room the client is in
+socket.on('updaterooms', function(rooms, current_room) {
+	$('#rooms').empty();
+	$('#rooms').append('<option>Switch room</option>');
+	$.each(rooms, function(key, value) {
+		$('#rooms').append('<option>' + value + '</option>');
+		/*
+		if(value == current_room){
+			$('#rooms').append('<option>' + value + '</option>');
+		}
+		else {
+			$('#rooms').append('<div><a href="#" onclick="switchRoom(\''+value+'\')">' + value + '</a></div>');
+		}
+		*/
+	});
+});
+
+function switchRoom(room){
+	socket.emit('switchRoom', room);
+	$('#incomingChatMessages').empty();
+}
+
+function addToChat(username, data) {
+	
+	var dt = new Date(data.time);
+	
+	var incomingChatMessages = $('#incomingChatMessages');
+	
+	//incomingChatMessages.prepend('<p><span style="color:' + usercolors[username] + '">' + data.text + '</p>');
+
+	incomingChatMessages.prepend('<p><span style="color:' + usercolors[username] + '">' + username + '</span> @ ' +
+             + (dt.getHours() < 10 ? '0' + dt.getHours() : dt.getHours()) + ':'
+             + (dt.getMinutes() < 10 ? '0' + dt.getMinutes() : dt.getMinutes())
+             + ': ' + data.text + '</p>');
+			 
 }
 
 var webrtc = new WebRTC({
@@ -237,10 +280,16 @@ $(function(){
 	
 	$('#outgoingChatMessage').keypress(function(e) {
 		if(e.which == 13) {
-			$(this).blur();
-			var message = $(this).val();
+			//$(this).blur();
+			
+			var obj = {
+				time: (new Date()).getTime(),
+				text: $(this).val()
+			};
+
 			$(this).val('');
-			socket.emit('sendchat', message);
+			
+			socket.emit('sendchat', obj);
 		}
 	});
 	
@@ -262,35 +311,41 @@ $(function(){
 		});
 	});
 	
-	webrtc.connection.on('message', function(message) {
+	webrtc.connection.on('message', function(username, message) {
 		
-		var new_data, textarea, total;
+		//var new_data, textarea, total;
 		
-		//console.log('message');
-		//console.log(message);
+		console.log('message');
+		console.log(message);
 		
-		if(message.message) {
+		if(typeof message !== 'undefined' && message.message) {
 			
-			new_data = message.sent + ' ' + message.from + ' > ' + message.message;
+			//new_data = message.sent + ' ' + message.from + ' > ' + message.message;
 			
+			/*
 			if (message.to) {
 				if (message.to == USERNAME) {
 					
 					$('#ou_' + u(message.from) + ':not(.messaged,.selected)').addClass('messaged');
 					
-					textarea = getUserChatTextArea(message.from); 
+					//textarea = getUserChatTextArea(message.from); 
 				}
 			} else if (message.room == ROOM_ID || message.from == 'system') {
-				textarea = document.getElementById('incomingChatMessages');
+				//textarea = document.getElementById('incomingChatMessages');
 
 				$('.me:not(.messaged,.selected)').addClass('messaged');					
 			}
+			*/
 			
+			/*
 			if(textarea) {
 				total = ((textarea.value ? textarea.value + "\n" : "") + new_data).split("\n");
 				if (total.length > CHAT_TEXTAREA_MAX_ROW) total = total.slice(total.length - CHAT_TEXTAREA_MAX_ROW);
 				textarea.value = total.join("\n");
 			}
+			*/
+			
+			if(message.room != 'SERVER') addToChat(username, message.message);
 		}
 	});							
 });

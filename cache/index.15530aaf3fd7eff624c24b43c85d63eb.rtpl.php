@@ -30,9 +30,7 @@
 		<div class="rooms-o">
         	<div class="rooms-i">
             	<div class="styled">
-                        <select id="rooms">						
-                          
-                        </select>
+                    <select id="rooms"></select>
                 </div>    
             </div>    
         </div>
@@ -47,14 +45,17 @@
 
         <input type="button" id="start-video" value="Start video">        
      
-		<div class="users-list" id="users" style="color:#fff;float:left"></div>
+		<div class="users-list" id="users" style="float:left"></div>
+		
+		<div class="users-list" id="room_users" style="float:left"></div>
 		
 		
 
 		
 			
         <div class="text-chat" id="chat">
-			<textarea id="incomingChatMessages"></textarea>
+			
+			<div id="incomingChatMessages" style="width:300px;height:190px;overflow:hidden;"></div>
 			<input type="text" id="outgoingChatMessage" />   
         </div>
         
@@ -131,8 +132,9 @@
 </script>
     
 	
-	<script src="../assets/js/holder/holder.js"></script>
+	
     
     <script src="design/dark/js/base.js"></script>
+	
   </body>
 </html>

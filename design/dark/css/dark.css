@@ -96,6 +96,7 @@ h1 a
 	width: 90%;
 	height: 75%;
 }
+
 #outgoingChatMessage
 {
 	margin-top:1em;
@@ -147,7 +148,7 @@ h1 a
 }
 .remote_video
 {
-	width:20%;
+	/*width:20%;*/
 	height:auto;
 }
 
