@@ -4,6 +4,7 @@ var socket = io.connect('http://videtwo.com:8080');
 // on connection to server, ask for user's name with an anonymous callback
 socket.on('connect', function(){
 	// call the server-side function 'adduser' and send one parameter (value of prompt)
+	console.log('adduser ' + USERNAME);
 	socket.emit('adduser', USERNAME /*prompt("What's your name?")*/);
 });
 
@@ -35,10 +36,26 @@ socket.on('updateusers', function(data) {
 	});
 });
 
+// listener, whenever the server emits 'updaterooms', this updates the room the client is in
+socket.on('updaterooms', function(rooms, current_room) {
+	$('#rooms').empty();
+	$('#rooms').append('<option>Switch room</option>');
+	$.each(rooms, function(key, value) {
+		$('#rooms').append('<option>' + value + '</option>');
+		/*
+		if(value == current_room){
+			$('#rooms').append('<option>' + value + '</option>');
+		}
+		else {
+			$('#rooms').append('<div><a href="#" onclick="switchRoom(\''+value+'\')">' + value + '</a></div>');
+		}
+		*/
+	});
+});
 
-
-
-
+function switchRoom(room){
+	socket.emit('switchRoom', room);
+}
 
 var online_users = [];
 												
@@ -214,6 +231,10 @@ function getUserChatTextArea (user) {
 					
 $(function(){
 
+	$('#rooms').change(function(e) {
+		switchRoom(this.options[this.selectedIndex].value);
+	});
+	
 	$('#outgoingChatMessage').keypress(function(e) {
 		if(e.which == 13) {
 			$(this).blur();

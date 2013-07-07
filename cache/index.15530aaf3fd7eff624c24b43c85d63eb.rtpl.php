@@ -30,11 +30,8 @@
 		<div class="rooms-o">
         	<div class="rooms-i">
             	<div class="styled">
-                        <select >
-                          <option selected value="Lobby">Lobby</option>
-                          <option value="Flame">Flame</option>
-                          <option value="Debugging">Debugging</option>
-                          <option value="Data mining">Data mining</option>
+                        <select id="rooms">						
+                          
                         </select>
                 </div>    
             </div>    
@@ -51,6 +48,8 @@
         <input type="button" id="start-video" value="Start video">        
      
 		<div class="users-list" id="users" style="color:#fff;float:left"></div>
+		
+		
 
 		
 			
