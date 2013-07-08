@@ -328,8 +328,8 @@ WebRTC.prototype.getLocalVideoContainer = function () {
     if (el && el.tagName === 'VIDEO') {
         return el;
     } else {
-		
-		var vframe = document.createElement('span');
+		/*
+		var vframe = document.createElement('div');
 		vframe.setAttribute('class', 'vframe');		
 		
 		var userv = document.createElement('a');
@@ -346,7 +346,10 @@ WebRTC.prototype.getLocalVideoContainer = function () {
         vframe.appendChild(video);
         vframe.appendChild(userv);
         el.appendChild(vframe);
-
+		*/
+		
+		var video = document.getElementById('local_video');
+		
         return video;
     }
 };
@@ -531,7 +534,7 @@ Conversation.prototype.handleRemoteStreamAdded = function (event) {
 	
 	var stream = this.stream = event.stream;
 
-	var el = document.createElement('span');
+	var el = document.createElement('div');
 	el.setAttribute('class', 'vframe');	 
     el.id = this.id;
 	

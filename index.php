@@ -15,67 +15,190 @@
 	
     $ROOM_ID = isset($_GET['room']) ? $_GET['room'] : 'lobby';
 	
+	$microtime =  microtime(1);
+	
+	$username = $_SESSION['username']; 
 ?>
 
 <!DOCTYPE html>
+
 <html>
-    <head>
+
+	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>New Chat</title>
-		<link rel="stylesheet" type="text/css" href="/style.css?<?php echo microtime(1); ?>" media="screen" />
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>      
-		<script src="<?php echo $DOMAIN; ?>/webrtc.js?<?php echo microtime(1); ?>"></script>
-		<script src="<?php echo $DOMAIN; ?>/socket.io.js"></script>      
-        <link href="design/dark/css/dark.css?<?php echo microtime(1); ?>" rel="stylesheet">      
+		<title>videTWo</title>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>              
 		<script> 
-			URL = "<?php echo $URL; ?>"; 					
-			USERNAME = "<?php echo $_SESSION['username']; ?>";
-			ROOM_ID = "<?php echo $ROOM_ID; ?>"
-			CHAT_TEXTAREA_MAX_ROW = 12; //how many rows go into the textarea before it starts to scroll up
+			URL = '<?php echo $URL; ?>'; 					
+			USERNAME = '<?php echo $username ?>';
+			ROOM_ID = '<?php echo $ROOM_ID; ?>';
 		</script>			
-		<script src="jscript.js?<?php echo microtime(1); ?>"></script>
-        <!–[if IE 7 ]> <html lang="en" class="ie7″> <![endif]–>
-        <!–[if IE 8 ]> <html lang="en" class="ie8″> <![endif]–>
-        <!–[if IE 9 ]> <html lang="en" class="ie9″> <![endif]–>
-        <!–[if (gt IE 9)|!(IE)]><!–> <html lang="en"> <!–<![endif]–> 
-    </head>
+		<script src="<?php echo $DOMAIN; ?>/webrtc.js?<?php echo $microtime; ?>"></script>
+		<script src="<?php echo $DOMAIN; ?>/socket.io.js?<?php echo $microtime; ?>"></script>   
+		<script src="<?php echo $DOMAIN; ?>/jscript.js?<?php echo $microtime; ?>"></script>
+		
+		<style>
+			html, body{
+				height: 90% ;
+				width:100%;
+				padding:0;
+				margin:0 auto;
+				font-family:Verdana, Geneva, sans-serif;
+				font-family:"Segoe UI";
+				font-size:16px;
+				color:#fff;
+				background: transparent url("design/dark/img/bg.png") repeat;	
+			}
 
-<?php
+			a {
+				text-align: center;
+				margin: 0 0.2em 0 0;
+				color: #eee;
+				text-decoration: none;
+			}
+			
+			a:hover {
+				text-decoration: underline;
+			}
+			
+			.logo{
+				height:40px;
+				width:150px;
+				background: transparent url("design/images/logos.png") no-repeat;
+			}		
+			
+			#incomingChatMessages {
+				background-color: #f5f5f5;
+				-webkit-box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);
+				box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);
+				border-radius: 2px;
+				border: solid 1px #ccc;
+				padding: 0.4em;
+				width:300px;
+				height:190px;
+				overflow:hidden;
+				margin: 0;
+				font-size: 0.85em;
+				outline: none;
+				font-family: inherit;;
+				box-sizing: border-box;
+				color: #000;
+			}
+
+			#outgoingChatMessage {
+				margin-top: 0.3em;
+				width:300px;
+				background-color: #f5f5f5;
+				-webkit-box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);
+				box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);	
+				border-radius: 2px;
+				border: solid 1px #ccc;
+				padding: 0.4em;		
+				font-size: 0.85em;
+				outline: none;
+				font-family: inherit;
+				box-sizing: border-box;	
+				-webkit-appearance: textfield;			
+				-webkit-rtl-ordering: logical;
+				-webkit-user-select: text;
+				cursor: auto;	
+				font: -webkit-small-control;
+				color: initial;
+				letter-spacing: normal;
+				word-spacing: normal;
+				text-transform: none;
+				text-indent: 0px;
+				text-shadow: none;
+				display: inline-block;
+				text-align: start;	
+				-webkit-writing-mode: horizontal-tb;		
+			}
+
+			#remoteVideos {
+			}
+
+			.vframe {
+				width: 294px;
+				height: 221x;
+				background-color: #eee;
+				text-align: center;	
+				border:1px solid white;
+				padding: 2px;
+				margin: 5px 0;
+			}
+
+			.vframe > a {
+				color: #000;
+				line-height: 30px;
+				text-decoration: none;
+			}
+			.vframe > a.me {
+				color: #3574C6;
+			}
+
+			.vframe > a > span {
+				color: orange;
+			}
+
+			.local_video {
+				display: block;
+				width: 294px;
+				height: 221x;
+				padding: 0;
+				margin: 0;
+				background-color: #000;
+				border:1px solid #000;
+			}
+			
+			.remote_video {
+				display: block;
+				width: 294px;
+				height: 221x;
+				padding: 0;
+				margin: 0;
+				background-color: #000;
+				border:1px solid #000;
+			}
+		
+		</style>
+		
+	</head>
 	
-	// template engine configurations
-	require "library/Rain/autoload.php";
+<body>
+
+	<div class="container">
+
+		<div class="navbar">
+
+			<div class="logo"></div>
+			
+			<div class="navlinks">
+				<ul class="nav">
+				  <li ><span class="navtext">Welcome: </span><a class="navtext" href="{url_profile}"><?php echo $username; ?></a></li>
+				  <li><a class="navtext" href="?logout">Logout</a></li>
+				  <li><input type="button" id="start-video" value="Start video"></li>
+				  <li><select id="rooms"><option>Loading Rooms...</option></select></li>
+				  <li><select id="online-users"><option>Online users</option></select></li>
+				  <li><select id="room-users"><option>Users in room</option></select></li>
+				</ul>
+			</div>
+
+		</div>
+
+		<div id="remoteVideos">
+			<div class="vframe">
+				<video class="local_video" id="local_video" autoplay="autoplay" muted="muted" poster="/design/images/qmf.jpg"></video>
+				<a id="ou_<?php echo $username; ?>" class="me" onclick="showRoomChat()"><?php echo $username; ?></a>
+			</div>		
+		</div>       
+		
+		<div class="text-chat" id="chat">
+			<div id="incomingChatMessages"></div>
+			<input type="text" id="outgoingChatMessage" />   
+		</div>
+
+	</div>
 	
-	// namespace
-	use Rain\Tpl;
-	
-	// config
-	$config = array(
-	"tpl_dir"       => "design/dark/",
-	"cache_dir"     => "cache/",
-	"debug"         => true, // set to false to improve the speed
-	);
-
-	Tpl::configure( $config );
-
-	// create the Tpl object
-    $tpl = new Tpl;
-
-    // assign variables
-    $tpl->assign("DOMAIN", $DOMAIN);
-    $tpl->assign("URL", $URL);
-	$tpl->assign("MICROTIME", microtime(1)); 	
-    $tpl->assign("site_title", "New Chat" );
-	$tpl->assign("user_nick", $_SESSION['username']);
-	$tpl->assign("room_name", $ROOM_ID); 
-
-	$users = scandir('/var/www/users/');
-	foreach($users as $user) {
-		if($user != '.' && $user != '..' && $user != '.gitignore') {
-
-			$tpl ->assign("userslist", $user);
-		}
-	}
-	
-    // draw the template
-    $tpl->draw( "index" );
-?>
+  </body>
+  
+</html>

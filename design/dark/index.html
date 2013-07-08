@@ -1,146 +1,168 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>{$site_title}</title>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>      
+	<script src="{$DOMAIN}/webrtc.js?{$MICROTIME}"></script>
+	<script src="{$DOMAIN}/socket.io.js?{$MICROTIME}"></script>           
+	<script> 
+		URL = '{$URL}'; 					
+		USERNAME = '{$user_nick}';
+		ROOM_ID = '{$room_name}';
+	</script>			
+	<script src="{$DOMAIN}/jscript.js?{$MICROTIME}"></script>
+	
+	<style>
+		html, body{
+			height: 90% ;
+			width:100%;
+			padding:0;
+			margin:0 auto;
+			font-family:Verdana, Geneva, sans-serif;
+			font-family:"Segoe UI";
+			font-size:16px;
+			color:#fff;
+			background: transparent url("design/dark/img/bg.png") repeat;	
+		}
+
+		a {
+			text-align: center;
+			margin: 0 0.2em 0 0;
+			color: #eee;
+			text-decoration: none;
+		}
+		
+		a:hover {
+			text-decoration: underline;
+		}
+		
+		.logo{
+			height:40px;
+			width:150px;
+			background: transparent url("design/images/logos.png") no-repeat;
+		}		
+		
+		#incomingChatMessages {
+			background-color: #f5f5f5;
+			-webkit-box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);
+			box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);
+			border-radius: 2px;
+			border: solid 1px #ccc;
+			padding: 0.4em;
+			width:300px;
+			height:190px;
+			overflow:hidden;
+			margin: 0;
+			font-size: 0.85em;
+			outline: none;
+			font-family: inherit;;
+			box-sizing: border-box;
+			color: #000;
+		}
+
+		#outgoingChatMessage {
+			margin-top: 0.3em;
+			width:300px;
+			background-color: #f5f5f5;
+			-webkit-box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);
+			box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);	
+			border-radius: 2px;
+			border: solid 1px #ccc;
+			padding: 0.4em;		
+			font-size: 0.85em;
+			outline: none;
+			font-family: inherit;
+			box-sizing: border-box;	
+			-webkit-appearance: textfield;			
+			-webkit-rtl-ordering: logical;
+			-webkit-user-select: text;
+			cursor: auto;	
+			font: -webkit-small-control;
+			color: initial;
+			letter-spacing: normal;
+			word-spacing: normal;
+			text-transform: none;
+			text-indent: 0px;
+			text-shadow: none;
+			display: inline-block;
+			text-align: start;	
+			-webkit-writing-mode: horizontal-tb;		
+		}
+
+		#remoteVideos {
+			display: block;
+			width: 100%;
+			max-width: 36.7em;
+			height: 15em; /*10.4em;*/
+			/*margin-left: auto;*/
+			/*margin-right:auto;*/
+			background: #292929;	
+			border: 1px solid red;
+		}
+
+		.vframe {
+			width: 17.25em; /*11.5em;*/           
+			height: 15em; /*10.4em;*/
+			background-color: #eee;
+			-moz-box-shadow: 0 0 5px #fff;
+			-webkit-box-shadow: 0 0 5px #fff;
+			box-shadow: 0 0 5px #ccc;
+			margin: 0.25em;
+			padding: 0.11em;	
+			text-align: center;	
+		}
+
+		.vframe > a {
+			color: #000;
+		}
+		.vframe > a.me {
+			color: #3574C6;
+		}
+
+		.vframe > a > span {
+			color: orange;
+		}
+		
+	</style>
+	
+</head>
+	
 <body id="page">
 
+	<div class="container">
 
-<div class="container">
-<!-- NAVBAR
-================================================== -->
-<div class="navbar">
-<div class="logo">
-	<h1><a id="brand" href="#">{$site_title}</a></h1>
-</div>
-    
-	<div class="navlinks">
+		<div class="navbar">
 
-			<ul class="nav">
-              <li ><span class="navtext">Welcome:</span><a class="navtext" href="{url_profile}">{$user_nick}</a></li>
-              <li><span class="navtext">|</span> </li>
-              <li><a class="navtext" href="?logout">Logout</a></li>
-            </ul>
-  
-            <ul class="nav">
-              <li class="active"><a href="#" class="navtext">About</a></li>
-              <span class="navtext">|</span> 
-              <li><a href="#about" class="navtext">FAQ</a></li>
-              <span class="navtext">|</span> 
-              <li><a href="#contact" class="navtext">Contact</a></li>
-            </ul>
-	</div>
-
-</div><!--/.nav-collapse -->
-
-		<div class="rooms-o">
-        	<div class="rooms-i">
-            	<div class="styled">
-                    <select id="rooms"></select>
-                </div>    
-            </div>    
-        </div>
-        
-        <div class="controls-o">
-            <div class="controls-i">
-                <input type="button" id="view-fullscreen" value="Fullscreen">
-                <input type="button" id="cancel-fullscreen" value="Cancel Fullscreen">
-            </div>
-        </div>
-        
-
-        <input type="button" id="start-video" value="Start video">        
-     
-		<div class="users-list" id="users" style="float:left"></div>
-		
-		<div class="users-list" id="room_users" style="float:left"></div>
-		
-		<!--div class="users-list" id="rooms" style="color:#fff;float:left"></div-->
-
-		<!--br />
-		<br />			
-		<div id="conversation"></div>
-		<input id="data" style="width:200px;" />
-		<input type="button" id="datasend" value="send" /-->
+			<div class="logo">
+				<!--h1><a id="brand" href="#">{$site_title}</a></h1-->
+			</div>
 			
-        <div class="text-chat" id="chat">
-			<!--textarea id="incomingChatMessages"></textarea-->
-			<div id="incomingChatMessages" style="width:300px;height:190px;overflow:hidden;"></div>
+			<div class="navlinks">
+				<ul class="nav">
+				  <li ><span class="navtext">Welcome: </span><a class="navtext" href="{url_profile}">{$user_nick}</a></li>
+				  <li><a class="navtext" href="?logout">Logout</a></li>
+				  <li><input type="button" id="start-video" value="Start video"></li>
+				  <li><select id="rooms"><option>Loading Rooms...</option></select></li>
+				</ul>
+			</div>
+
+		</div>
+	 
+		<div class="users-list" id="users"></div>
+		
+		<div class="users-list" id="room_users"></div>
+
+		<div id="remoteVideos"></div>       
+		
+		<div class="text-chat" id="chat">
+			<div id="incomingChatMessages"></div>
 			<input type="text" id="outgoingChatMessage" />   
-        </div>
-        
-        <div class="video-chat ">
-        	<div id="remoteVideos"></div>       
-        </div>
+		</div>
 
-</div>
-
-
-     <script>
-		document.addEventListener("keydown", function (evt) {
-			console.log("keydown. You pressed the " + evt.keyCode + " key")
-		}, false);
-     </script>
-
-
-    <!-- Le javascript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="design/dark/js/bootstrap.min.js"></script>
-
-    <script>
-		var page = document.getElementById('page'),
-		ua = navigator.userAgent,
-		iphone = ~ua.indexOf('iPhone') || ~ua.indexOf('iPod'),
-		ipad = ~ua.indexOf('iPad'),
-		ios = iphone || ipad,
-		// Detect if this is running as a fullscreen app from the homescreen
-		fullscreen = window.navigator.standalone,
-		android = ~ua.indexOf('Android'),
-		lastWidth = 0;
-		 
-		if (android) {
-		// Android's browser adds the scroll position to the innerHeight, just to
-		// make this really fucking difficult. Thus, once we are scrolled, the
-		// page height value needs to be corrected in case the page is loaded
-		// when already scrolled down. The pageYOffset is of no use, since it always
-		// returns 0 while the address bar is displayed.
-		window.onscroll = function() {
-		page.style.height = window.innerHeight + 'px'
-		}
-		}
-		var setupScroll = window.onload = function() {
-		// Start out by adding the height of the location bar to the width, so that
-		// we can scroll past it
-		if (ios) {
-		// iOS reliably returns the innerWindow size for documentElement.clientHeight
-		// but window.innerHeight is sometimes the wrong value after rotating
-		// the orientation
-		var height = document.documentElement.clientHeight;
-		// Only add extra padding to the height on iphone / ipod, since the ipad
-		// browser doesn't scroll off the location bar.
-		if (iphone && !fullscreen) height += 60;
-		page.style.height = height + 'px';
-		} else if (android) {
-		// The stock Android browser has a location bar height of 56 pixels, but
-		// this very likely could be broken in other Android browsers.
-		page.style.height = (window.innerHeight + 56) + 'px'
-		}
-		// Scroll after a timeout, since iOS will scroll to the top of the page
-		// after it fires the onload event
-		setTimeout(scrollTo, 0, 0, 1);
-		};
-		(window.onresize = function() {
-		var pageWidth = page.offsetWidth;
-		// Android doesn't support orientation change, so check for when the width
-		// changes to figure out when the orientation changes
-		if (lastWidth == pageWidth) return;
-		lastWidth = pageWidth;
-		setupScroll();
-		})();
-
-
-</script>
-    
-	
-	<!--script src="../assets/js/holder/holder.js"></script-->
-    
-    <script src="design/dark/js/base.js"></script>
+	</div>
 	
   </body>
+  
 </html>

@@ -30,14 +30,10 @@ u = function (n) {
 	
 var socket = io.connect('http://videtwo.com:8080');
 
-// on connection to server, ask for user's name with an anonymous callback
 socket.on('connect', function(){
-	// call the server-side function 'adduser' and send one parameter (value of prompt)
-	console.log('adduser ' + USERNAME);
-	socket.emit('adduser', USERNAME /*prompt("What's your name?")*/);
+	socket.emit('adduser', USERNAME);
 });
 
-// listener, whenever the server emits 'updatechat', this updates the chat body
 socket.on('updatechat', function (username, data, history) {
 	
 	/*
@@ -64,28 +60,58 @@ socket.on('updateusers', function(unames, ucolors) {
 	usernames = unames;	
 	usercolors = ucolors;
 	
-	$('#users').empty();
+	//$('#online-users').empty();
 	
-	$('#users').append('<span style="color: white">Logged in users: </span>');
+	//$('#users').append('<span style="color: white">Logged in users: </span>');
 	
 	for(var i in usernames) {
-		$('#users').append('<span class="user" style="margin: 0 5px; color:' + usercolors[i] + ';">' + usernames[i] +  '<span>');
+		$('#online-users').append('<option style="color:' + usercolors[i] + ';">' + usernames[i] +  '</option>');
 	}
 });
 
 socket.on('room_users', function(rusers, room) {
-	console.log('room_users');
+	//console.log('room_users');
 
 	room_users = rusers;
 	
 	console.log(room_users);
 
-	$('#room_users').empty();
+	//$('#room-users').empty();
 	
-	$('#room_users').append('<span style="color: white">Users in room ' + room + ': </span>');
+	//$('#room-users').append('<span style="color: white">Users in room ' + room + ': </span>');
 	
 	for(var i in room_users) {
-		$('#room_users').append('<span class="user" style="margin: 0 5px; color:' + usercolors[room_users[i]] + ';">' + room_users[i] +  '<span>');
+		$('#room-users').append('<option style="color:' + usercolors[room_users[i]] + ';">' + room_users[i] +  '</option>');
+		
+		var user_video = document.getElementById('ou_' + room_users[i]);
+		
+		//console.log(user_video);
+		
+		if (! user_video) {
+			
+			var container = document.getElementById('remoteVideos');
+	
+			var vframe = document.createElement('div');
+			vframe.setAttribute('class', 'vframe');	 
+			vframe.id = this.id;
+			
+			var userv = document.createElement('a');
+			userv.setAttribute('id', 'ou_' + room_users[i]);
+			userv.setAttribute('onclick', "showUserChat('" + room_users[i] + "', 1)");
+			userv.innerHTML = room_users[i];
+			
+			var video = document.createElement('video');    
+			video.id = this.id;    
+			video.setAttribute('class', 'remote_video'); 
+			video.setAttribute('poster', '/design/images/qmf.jpg'); 
+
+			//attachMediaStream(video, stream);
+
+			vframe.appendChild(video);
+			vframe.appendChild(userv);
+			
+			container.appendChild(vframe);
+		}
 	}
 });
 
