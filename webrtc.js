@@ -437,6 +437,7 @@ function Conversation(options) {
     this.initiator = options.initiator;
     // Create an RTCPeerConnection via the polyfill (adapter.js).
     this.pc = new RTCPeerConnection(this.parent.config.peerConnectionConfig, this.parent.config.peerConnectionContraints);
+    this.pc = new RTCPeerConnection(null);
     this.pc.onicecandidate = this.onIceCandidate.bind(this);
     this.pc.addStream(this.parent.localStream);
     this.pc.onaddstream = this.handleRemoteStreamAdded.bind(this);

@@ -73,23 +73,6 @@
 				background: transparent url("design/images/logos.png") no-repeat;
 			}	
 			
-			.nav {
-				float: left;
-				width: 90%;
-				/*border: 1px solid red;*/
-			}
-			
-			.nav > li {
-				list-style-type: none;
-				float: left;
-				padding: 0 10px;
-				line-height: 25px;
-			}				
-			
-			.nav > li:first-child {
-				padding-left: 0;
-			}	
-			
 			#incomingChatMessages {
 				background-color: #f5f5f5;
 				-webkit-box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);
@@ -137,7 +120,7 @@
 				-webkit-writing-mode: horizontal-tb;		
 			}
 
-			#remoteVideos {
+			.remoteVideos {
 				float: left;
 				width: 90%;
 				/*border: 1px solid red;*/
@@ -158,8 +141,14 @@
 				color: #000;
 				line-height: 30px;
 				text-decoration: none;
+				cursor: pointer;
 			}
+			
 			.vframe > a.me {
+				color: #3574C6;
+			}			
+			
+			.vframe > a.curr {
 				color: #3574C6;
 			}
 
@@ -195,19 +184,13 @@
 
 	<div class="container">
 
-		<div class="navbar">
+		<div class="logo"></div>
 
-			<div class="logo"></div>
-			
-			<ul class="nav">
-			  <li ><span>Welcome: </span><a class="navtext" href="{url_profile}"><?php echo $username; ?></a></li>
-			  <li><a href="?logout">Logout</a></li>
-			  <li><select id="rooms"><option>Loading Rooms...</option></select></li>
-			</ul>
-
-		</div>
-
-		<div id="remoteVideos">
+		<div>Welcome: <?php echo $username; ?></div>
+		
+		<div id="rooms" class="remoteVideos">Loading Rooms</div>
+					
+		<div id="remoteVideos" class="remoteVideos">
 			<div class="vframe" id="local_video_el">
 				<video class="local_video" id="local_video" autoplay="autoplay" muted="muted" poster="/design/images/qmf.jpg"></video>
 				<a id="ou_<?php echo $username; ?>" class="me"><?php echo $username; ?></a>
@@ -221,7 +204,9 @@
 
 	</div>
 
-	<ul class="nav" id="debug">
+	<div><a href="?logout">Logout</a></div>
+	
+	<ul id="debug">
 	  <li><select id="online-users"><option>Online users</option></select></li>
 	  <li><select id="room-users"><option>Users in room</option></select></li>
 	</ul>

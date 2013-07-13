@@ -56,7 +56,6 @@ socket.on('updatechat', function (username, data, history) {
 socket.on('updateusers', function(unames, ucolors) {
 	usernames = unames;	
 	usercolors = ucolors;
-	usercolors = ucolors;
 	
 	for(var i in usernames) {
 		$('#online-users').append('<option style="color:' + usercolors[i] + ';">' + usernames[i] +  '</option>');
@@ -108,11 +107,39 @@ socket.on('room_users', function(rusers, room) {
 // listener, whenever the server emits 'updaterooms', this updates the room the client is in
 socket.on('updaterooms', function(rooms, current_room) {
 	$('#rooms').empty();
-	$('#rooms').append('<option>Switch room</option>');
 	$.each(rooms, function(key, value) {
-		$('#rooms').append('<option>' + value + '</option>');
+		//$('#rooms').append("<a onclick=\"switchRoom('" + value + "')\">" + value + "</a>");
+		
+		console.log(value);
+		
+		var room = document.getElementById('room_' + value);
+		
+		if (! room) {
+			
+			var container = document.getElementById('rooms');
+	
+			var vframe = document.createElement('div');
+			vframe.setAttribute('class', 'vframe');	 
+			vframe.id = 'room_' + value;
+			
+			var userv = document.createElement('a');
+			userv.setAttribute('id', 'room_name_' + value);
+			userv.setAttribute('onclick', "switchRoom('" + value + "')");
+			userv.innerHTML = value;
+			
+			var img = document.createElement('img');    
+			img.id = 'room_video_' + value;    
+			img.setAttribute('class', 'remote_video'); 
+			img.setAttribute('src', '/design/images/peep.jpg'); 
+
+			vframe.appendChild(img);
+			vframe.appendChild(userv);
+			
+			container.appendChild(vframe);
+		}	
+		
+		$('#room_name_' + current_room).addClass('curr');	
 	});
-	$('#rooms').val(current_room);
 });
 
 function switchRoom(room){
@@ -151,10 +178,6 @@ webrtc.on('readyToCall', function () {
 });
 					
 $(function(){
-  
-	$('#rooms').change(function(e) {
-		switchRoom(this.options[this.selectedIndex].value);
-	});
 	
 	$('#outgoingChatMessage').keypress(function(e) {
 		if(e.which == 13) {
