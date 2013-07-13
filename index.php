@@ -208,9 +208,9 @@
 		</div>
 
 		<div id="remoteVideos">
-			<div class="vframe">
+			<div class="vframe" id="local_video_el">
 				<video class="local_video" id="local_video" autoplay="autoplay" muted="muted" poster="/design/images/qmf.jpg"></video>
-				<a id="ou_<?php echo $username; ?>" class="me" onclick="showRoomChat()"><?php echo $username; ?></a>
+				<a id="ou_<?php echo $username; ?>" class="me"><?php echo $username; ?></a>
 			</div>		
 		</div>       
 		

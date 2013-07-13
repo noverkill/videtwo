@@ -1,11 +1,13 @@
 
 var usernames = [];
 var usercolors = [];
-		
+
 var room_users = [];
 
 var remotevid = null;
-	
+
+var online_users = [];
+
 format = function(date){
 	var dd=date.getDate();
 
@@ -135,7 +137,6 @@ function addToChat(username, data) {
 }
 
 var webrtc = new WebRTC({
-	localVideoEl: 'remoteVideos',
 	remoteVideosEl: 'remoteVideos',
 	// immediately ask for camera access
 	autoRequestMedia: true

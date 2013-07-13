@@ -1,7 +1,7 @@
 ;(function () {
 
 var logger = {
-    log: function (){/*console.log(arguments)*/},
+    log: function (){console.log(arguments)},
     warn: function (){console.log('warn: ' + arguments)},
     error: function (){console.log('error: ' + arguments)}
 };
@@ -63,8 +63,11 @@ if (navigator.mozGetUserMedia) {
 
     // Attach a media stream to an element.
     attachMediaStream = function(element, stream) {
+		console.log('attachMediaStream');
+		console.log(element);
         element.autoplay = true;
         element.src = webkitURL.createObjectURL(stream);
+		element.play();
     };
 
     reattachMediaStream = function(to, from) {
@@ -259,13 +262,9 @@ function WebRTC(opts) {
     });
 
     connection.on('message', function (message) {
-        
-		//console.log('message received:');
-		//console.log(message);
-        
-		var existing = self.pcs[message.from];
-        
-		if (existing) {
+        //console.log('message received: ' + message);
+        var existing = self.pcs[message.from];
+        if (existing) {
             existing.handleMessage(message);
         } else {
             // create the conversation object
@@ -277,8 +276,18 @@ function WebRTC(opts) {
             self.pcs[message.from].handleMessage(message);
         }
     });
+	
+	/*
+    connection.on('joined', function (room) {
+        console.log('got a joined');
+        console.log(room);
+        if (!self.pcs[room.id]) {
+            self.startVideoCall(room.id);
+        }
+    });
+	*/
 
-    connection.on('joined', function (details) {
+	connection.on('joined', function (details) {
         //console.log('got a joined');
 		online_users = details.users;
 		//console.log(online_users);
@@ -287,11 +296,9 @@ function WebRTC(opts) {
         }
     });
 	
-    connection.on('left', function (details) {
-        //console.log('left');
-		online_users = details.users;
-		//console.log(online_users);		
-        var conv = self.pcs[details.id];
+    connection.on('left', function (room) {
+        var conv = self.pcs[room.id];
+		//online_users = details.users;
         if (conv) conv.handleStreamRemoved();
     });
 
@@ -323,35 +330,28 @@ WebRTC.prototype.getEl = function (idOrEl) {
 // this accepts either element ID or element
 // and either the video tag itself or a container
 // that will be used to put the video tag into.
+/*
 WebRTC.prototype.getLocalVideoContainer = function () {
     var el = this.getEl(this.config.localVideoEl);
     if (el && el.tagName === 'VIDEO') {
         return el;
     } else {
-		/*
-		var vframe = document.createElement('div');
-		vframe.setAttribute('class', 'vframe');		
-		
-		var userv = document.createElement('a');
-		userv.setAttribute('id', 'ou_' + USERNAME);
-		userv.setAttribute('class', 'me');
-		userv.setAttribute('onclick', 'showRoomChat()');
-					
-		var video = document.createElement('video');      
-        video.setAttribute('class', 'local_video');
-        //video.setAttribute('muted', 'true');
-        video.muted = 'true';
-        //video.setAttribute('controls', 'true');
+        var video = document.createElement('video');
         
-        vframe.appendChild(video);
-        vframe.appendChild(userv);
-        el.appendChild(vframe);
-		*/
-		
-		var video = document.getElementById('local_video');
-		
+        video.setAttribute('class', 'local_video');
+        
+        el.appendChild(video);
+
         return video;
     }
+};
+*/
+
+WebRTC.prototype.getLocalVideoContainer = function () {
+
+	var video = document.getElementById('local_video');
+
+	return video;
 };
 
 WebRTC.prototype.getRemoteVideoContainer = function () {
@@ -375,6 +375,13 @@ WebRTC.prototype.createRoom = function (name, cb) {
     }
 };
 
+/*
+WebRTC.prototype.joinRoom = function (name) {
+    this.connection.emit('join', name);
+    this.roomName = name;
+};
+*/
+
 WebRTC.prototype.joinRoom = function (room_name, user_name) {
     this.connection.emit('join', room_name, user_name);
     this.roomName = room_name;
@@ -382,8 +389,6 @@ WebRTC.prototype.joinRoom = function (room_name, user_name) {
 
 WebRTC.prototype.leaveRoom = function () {
     if (this.roomName) {
-		//console.log('leave');
-		//console.log(this.id);
         this.connection.emit('leave', this.roomName);
         for (var pc in this.pcs) {
             this.pcs[pc].end();
@@ -459,7 +464,7 @@ Conversation.prototype = Object.create(WildEmitter.prototype, {
 
 Conversation.prototype.handleMessage = function (message) {
     if (message.type === 'offer') {
-        logger.log('setting remote description');
+        //logger.log('setting remote description');
         this.pc.setRemoteDescription(new RTCSessionDescription(message.payload));
         this.answer();
     } else if (message.type === 'answer') {
@@ -495,7 +500,9 @@ Conversation.prototype.start = function () {
     var self = this;
     this.pc.createOffer(function (sessionDescription) {
         logger.log('setting local description');
+
 		sessionDescription.username = USERNAME;
+
         self.pc.setLocalDescription(sessionDescription);
         logger.log('sending offer', sessionDescription);
         self.send('offer', sessionDescription);
@@ -518,67 +525,89 @@ Conversation.prototype.answer = function () {
     }, null, this.mediaConstraints);
 };
 
+/*
 Conversation.prototype.handleRemoteStreamAdded = function (event) {
-	
+    var stream = this.stream = event.stream,
+        el = document.createElement('video'),
+        container = this.parent.getRemoteVideoContainer();
+    
+    el.id = this.id;
+    
+    el.setAttribute('class', 'remote_video'); 
+
+    attachMediaStream(el, stream);
+    
+    if (container) container.appendChild(el);
+    this.emit('videoAdded', el);
+};
+*/
+
+/*
+Conversation.prototype.handleRemoteStreamAdded = function (event) {
+
 	console.log('handleRemoteStreamAdded');
 	console.log(event);
 	console.log(online_users);
 	console.log(this);
+
+    var stream = this.stream = event.stream;
 	
-	var username = "ezy85";
+	var username = 'ezy85';
 	
-	/*
+	var el = document.createElement('div');
+	el.setAttribute('class', 'vframe');	 
+    el.id = this.id;
+		
+	var userv = document.createElement('a');
+	userv.setAttribute('id', 'ou_' + username);
+	userv.innerHTML = username;
+	
+	var video = document.createElement('video');    
+    video.id = this.id;    
+    video.setAttribute('class', 'remote_video'); 
+	
+    attachMediaStream(video, stream);
+	
+	el.appendChild(video);
+    el.appendChild(userv);
+
+	var container = this.parent.getRemoteVideoContainer();
+    
+	console.log(container);
+	
+    if (container) container.appendChild(el);
+	
+	this.emit('videoAdded', el);
+};
+*/
+
+Conversation.prototype.handleRemoteStreamAdded = function (event) {
+
+	console.log('handleRemoteStreamAdded');
+	
     for (var i = 0; i < online_users.length; i++) {
         if (online_users[i]['id'] == this.id) {
             username = online_users[i]['name'];
 			break;
         }
     }
-	*/
 	
 	console.log(username);
 	
 	if(typeof username == 'undefined') return;
 	
-	console.log('fuck');
-	
 	var stream = this.stream = event.stream;
 	
-	/*
-	var el = document.createElement('div');
-	el.setAttribute('class', 'vframe');	 
-    el.id = this.id;
-	
-	var userv = document.createElement('a');
-	userv.setAttribute('id', 'ou_' + username);
-	//userv.setAttribute('onclick', "showUserChat('" + username + "', 1)");
-	userv.innerHTML = username;
-	
-	var video = document.createElement('video');    
-    video.id = this.id;    
-    video.setAttribute('class', 'remote_video'); 
-	*/
 	var video = document.getElementById('ou_' + username);
-	
+
 	console.log(video);
 	
     attachMediaStream(video, stream);
-	
-	/*
-	el.appendChild(video);
-    el.appendChild(userv);
-		
-	var container = this.parent.getRemoteVideoContainer();
-    
-    if (container) container.appendChild(el);
-	*/
-	
-    //this.emit('videoAdded', el);
 };
 
 Conversation.prototype.handleStreamRemoved = function () {
     var video = document.getElementById(this.id),
-        container = this.parent.getRemoteVideoContainer();
+		container = this.parent.getRemoteVideoContainer();
     if (video && container) container.removeChild(video);
     this.emit('videoRemoved', video);
     delete this.parent.pcs[this.id];
