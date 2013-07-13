@@ -520,43 +520,60 @@ Conversation.prototype.answer = function () {
 
 Conversation.prototype.handleRemoteStreamAdded = function (event) {
 	
-	//console.log('handleRemoteStreamAdded');
-	//console.log(online_users);
+	console.log('handleRemoteStreamAdded');
+	console.log(event);
+	console.log(online_users);
+	console.log(this);
 	
-	var username;
-
+	var username = "ezy85";
+	
+	/*
     for (var i = 0; i < online_users.length; i++) {
         if (online_users[i]['id'] == this.id) {
             username = online_users[i]['name'];
 			break;
         }
     }
+	*/
+	
+	console.log(username);
+	
+	if(typeof username == 'undefined') return;
+	
+	console.log('fuck');
 	
 	var stream = this.stream = event.stream;
-
+	
+	/*
 	var el = document.createElement('div');
 	el.setAttribute('class', 'vframe');	 
     el.id = this.id;
 	
 	var userv = document.createElement('a');
 	userv.setAttribute('id', 'ou_' + username);
-	userv.setAttribute('onclick', "showUserChat('" + username + "', 1)");
+	//userv.setAttribute('onclick', "showUserChat('" + username + "', 1)");
 	userv.innerHTML = username;
 	
 	var video = document.createElement('video');    
     video.id = this.id;    
     video.setAttribute('class', 'remote_video'); 
-
+	*/
+	var video = document.getElementById('ou_' + username);
+	
+	console.log(video);
+	
     attachMediaStream(video, stream);
-
+	
+	/*
 	el.appendChild(video);
     el.appendChild(userv);
 		
 	var container = this.parent.getRemoteVideoContainer();
     
     if (container) container.appendChild(el);
+	*/
 	
-    this.emit('videoAdded', el);
+    //this.emit('videoAdded', el);
 };
 
 Conversation.prototype.handleStreamRemoved = function () {

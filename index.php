@@ -38,6 +38,12 @@
 		<script src="<?php echo $DOMAIN; ?>/jscript.js?<?php echo $microtime; ?>"></script>
 		
 		<style>
+			
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			
 			html, body{
 				height: 90% ;
 				width:100%;
@@ -65,7 +71,24 @@
 				height:40px;
 				width:150px;
 				background: transparent url("design/images/logos.png") no-repeat;
-			}		
+			}	
+			
+			.nav {
+				float: left;
+				width: 90%;
+				/*border: 1px solid red;*/
+			}
+			
+			.nav > li {
+				list-style-type: none;
+				float: left;
+				padding: 0 10px;
+				line-height: 25px;
+			}				
+			
+			.nav > li:first-child {
+				padding-left: 0;
+			}	
 			
 			#incomingChatMessages {
 				background-color: #f5f5f5;
@@ -75,7 +98,7 @@
 				border: solid 1px #ccc;
 				padding: 0.4em;
 				width:300px;
-				height:190px;
+				height:200px;
 				overflow:hidden;
 				margin: 0;
 				font-size: 0.85em;
@@ -115,16 +138,20 @@
 			}
 
 			#remoteVideos {
+				float: left;
+				width: 90%;
+				/*border: 1px solid red;*/
 			}
 
 			.vframe {
-				width: 294px;
-				height: 221x;
+				float: left;
+				width: 296px;
+				height: 251px;
 				background-color: #eee;
 				text-align: center;	
-				border:1px solid white;
+				/*border:1px solid white;*/
 				padding: 2px;
-				margin: 5px 0;
+				margin: 5px 5px 5px 0;
 			}
 
 			.vframe > a {
@@ -143,7 +170,7 @@
 			.local_video {
 				display: block;
 				width: 294px;
-				height: 221x;
+				height: 221px;
 				padding: 0;
 				margin: 0;
 				background-color: #000;
@@ -153,7 +180,7 @@
 			.remote_video {
 				display: block;
 				width: 294px;
-				height: 221x;
+				height: 221px;
 				padding: 0;
 				margin: 0;
 				background-color: #000;
@@ -172,16 +199,11 @@
 
 			<div class="logo"></div>
 			
-			<div class="navlinks">
-				<ul class="nav">
-				  <li ><span class="navtext">Welcome: </span><a class="navtext" href="{url_profile}"><?php echo $username; ?></a></li>
-				  <li><a class="navtext" href="?logout">Logout</a></li>
-				  <li><input type="button" id="start-video" value="Start video"></li>
-				  <li><select id="rooms"><option>Loading Rooms...</option></select></li>
-				  <li><select id="online-users"><option>Online users</option></select></li>
-				  <li><select id="room-users"><option>Users in room</option></select></li>
-				</ul>
-			</div>
+			<ul class="nav">
+			  <li ><span>Welcome: </span><a class="navtext" href="{url_profile}"><?php echo $username; ?></a></li>
+			  <li><a href="?logout">Logout</a></li>
+			  <li><select id="rooms"><option>Loading Rooms...</option></select></li>
+			</ul>
 
 		</div>
 
@@ -198,7 +220,12 @@
 		</div>
 
 	</div>
-	
+
+	<ul class="nav" id="debug">
+	  <li><select id="online-users"><option>Online users</option></select></li>
+	  <li><select id="room-users"><option>Users in room</option></select></li>
+	</ul>
+			
   </body>
   
 </html>

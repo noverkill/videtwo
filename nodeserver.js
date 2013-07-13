@@ -6,13 +6,6 @@ var server = http.createServer(app).listen(8080);
 
 var io = require('socket.io').listen(server,{log: 0});  // Your app passed to socket.io
 
-// routing
-/*
-app.get('/', function (req, res) {
-  //res.sendfile(__dirname + '/chat.html');
-});
-*/
-
 var users = [];
 
 Array.prototype.push2 = function(a){
@@ -94,8 +87,12 @@ function removeRoomUser (room, user) {
 	}
 }
 
-io.sockets.on('connection', function (socket) {
+function sendCallback(err) {
+    if (err) console.error("send() error: " + err);
+}
 
+io.sockets.on('connection', function (socket) {
+	
 	// when the client emits 'adduser', this listens and executes
 	socket.on('adduser', function(username){
 		
@@ -196,17 +193,15 @@ io.sockets.on('connection', function (socket) {
 	
 	//from nodeserver.js
     // pass a message
-    socket.on('message', function (details) {
-        var otherClient = io.sockets.sockets[details.to];
-
-        if (!otherClient) {
-			socket.broadcast.emit('message', details);
-            return;
-        }
-        delete details.to;
-        details.from = socket.id;
-        otherClient.emit('message', details);
-    });
+    socket.on('message', function (message) {
+        console.log(message);
+        socket.broadcast.emit('message', message);
+	});    
+	
+	socket.on('candidate', function (message) {
+        //console.log(message);
+        socket.broadcast.emit('candidate', message);
+	});
 
     socket.on('join', function (room_name, user_name) {
         socket.join(room_name);
