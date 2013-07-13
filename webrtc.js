@@ -1,7 +1,7 @@
 ;(function () {
 
 var logger = {
-    log: function (){console.log(arguments)},
+    log: function (){/*console.log(arguments)*/},
     warn: function (){console.log('warn: ' + arguments)},
     error: function (){console.log('error: ' + arguments)}
 };

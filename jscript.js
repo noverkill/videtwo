@@ -43,13 +43,14 @@ socket.on('updatechat', function (username, data, history) {
 	if(history && history.length) {
 	    $('#incomingChatMessages').empty();
 		$.each(history, function(key, value) {
-			if(value.author != 'SERVER') {
+			//if(value.author != 'SERVER') {
 				addToChat(value.author, value);
-			}
+			//}
 		});
 	}
 	
-	if(username != 'SERVER') addToChat(username, data);
+	console.log(data);
+	/*if(username != 'SERVER')*/ addToChat(username, data);
 });
 
 // listener, whenever the server emits 'updateusers', this updates the username list
@@ -66,7 +67,7 @@ socket.on('room_users', function(rusers, room) {
 
 	room_users = rusers;
 	
-	console.log(room_users);
+	//console.log(room_users);
 	
 	$('#room-users').empty();
 	$('#room-users').append('<option>Users in room</option>');

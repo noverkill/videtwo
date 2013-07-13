@@ -81,8 +81,8 @@
 				border: solid 1px #ccc;
 				padding: 0.4em;
 				width:300px;
-				height:200px;
-				overflow:hidden;
+				min-height:200px;
+				/*overflow:auto;*/
 				margin: 0;
 				font-size: 0.85em;
 				outline: none;
@@ -197,7 +197,7 @@
 			</div>		
 		</div>       
 		
-		<div class="text-chat" id="chat">
+		<div class="text-chat" id="chat" style="clear:both;">
 			<div id="incomingChatMessages"></div>
 			<input type="text" id="outgoingChatMessage" />   
 		</div>

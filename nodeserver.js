@@ -89,59 +89,41 @@ io.sockets.on('connection', function (client) {
             
         var otherClient = io.sockets.sockets[details.to];
 
-        if (!otherClient) {
-            console.log('Message Received: ', details);
-            client.broadcast.emit('message', details);
-            return;
-        }
-        
-        delete details.to;
-        
+        if (!otherClient) return;
+		
         details.from = client.id;
         
         otherClient.emit('message', details);
     });
-
-	/*
-    client.on('adduser', function(username){
-        console.log(username);
-        client.username = username;
-        usernames.push(username);
-        //client.broadcast.emit('userconnected', username);
-        io.sockets.emit('userconnected', usernames);
-    });
-	*/
 	
 	// when the client emits 'adduser', this listens and executes
 	client.on('adduser', function(username){
 		
-		//console.log('adduser');
-		
-		// store the username in the socket session for this client
 		client.username = username;
-		// store the room name in the socket session for this client
+
 		client.room = rooms[0];
-		// add the client's username to the global list
+
 		usernames[username] = username;
 
 		client.usercolor = colors.shift();		
 		usercolors[username] = client.usercolor;
 		colors.push(client.usercolor);	//push back the color to the end of the list
 				
-		//update userlist
 		io.sockets.emit('updateusers', usernames, usercolors);
 		
-		// send client to room
 		client.join(client.room);
 		client.emit('updaterooms', rooms, client.room);
 		
-		// echo to client they've connected
-		var msg = username + ' has connected to ' + client.room;
-		client.emit('updatechat', 'SERVER', msg, history[client.room]);
-		// echo to room 1 that a person has connected to their room
-		client.to(client.room).emit('updatechat', 'SERVER', msg);
+		var msg = username + ' has entered into ' + client.room;
+		var time = (new Date()).getTime();
 		
-		addToHistory(client.room, (new Date()).getTime(), msg, 'SERVER');
+		//client.emit('updatechat', 'SERVER', {'text': msg, 'time': (new Date()).getTime()}, history[client.room]);
+		// echo to room 1 that a person has connected to their room
+		//client.to(client.room).emit('updatechat', 'SERVER', {'text': msg, 'time': (new Date()).getTime()});
+		
+		io.sockets.in(client.room).emit('updatechat', 'SERVER', {'text': msg, 'time': time}, history[client.room]);
+		
+		addToHistory(client.room, time, msg, 'SERVER');
 
 		addRoomUser (client.room, username);
 		
@@ -166,20 +148,24 @@ io.sockets.on('connection', function (client) {
 		io.sockets.in(client.room).emit('room_users', room_users[client.room], client.room);
 		
 		// sent message to OLD room
-		var msg = client.username +' has left ' + client.room;		
-		client.broadcast.to(client.room).emit('updatechat', 'SERVER', msg);
+		var msg = client.username +' has left ' + client.room;	
+		var time = (new Date()).getTime();
 		
-		addToHistory(client.room, (new Date()).getTime(), msg, 'SERVER');
+		client.broadcast.to(client.room).emit('updatechat', 'SERVER', {'text': msg, 'time': time});
+		
+		addToHistory(client.room, time, msg, 'SERVER');
 		
 		// join new room, received as function parameter
 		client.join(newroom);
 		client.room = newroom;
 		
-		msg = client.username +'  has joined to ' + client.room;
-		client.emit('updatechat', 'SERVER', msg, history[client.room]);		
-		client.broadcast.to(newroom).emit('updatechat', 'SERVER', msg);
+		msg = client.username +'  has entered into ' + client.room;
+		time = (new Date()).getTime();
+		
+		client.emit('updatechat', 'SERVER', {'text': msg, 'time': time}, history[client.room]);		
+		client.broadcast.to(newroom).emit('updatechat', 'SERVER', {'text': msg, 'time': time});
 
-		addToHistory(client.room, (new Date()).getTime(), msg, 'SERVER');
+		addToHistory(client.room, time, msg, 'SERVER');
 		
 		// update socket session room title
 		client.emit('updaterooms', rooms, newroom);
@@ -210,17 +196,6 @@ io.sockets.on('connection', function (client) {
         });
     });
 	
-	/*
-    client.on('disconnect',function() {
-	//insert data corresponding to current socket into database
-	console.log('The client has disconnected!');
-	console.log(client.id);
-	console.log(client.username);
-	usernames.splice(usernames.indexOf(client.username), 1);
-	io.sockets.emit('userdeleted', client.username);
-    });
-	*/
-	
 	// when the user disconnects.. perform this
 	client.on('disconnect', function(){
 
@@ -236,10 +211,12 @@ io.sockets.on('connection', function (client) {
 		
 		// echo globally that this client has left
 		var msg = client.username + ' has disconnected'; 
-		client.broadcast.emit('updatechat', 'SERVER', msg);
+		var time = (new Date()).getTime();
+		
+		client.broadcast.emit('updatechat', 'SERVER', {'text': msg, 'time': time});
 		client.leave(client.room);
 
-		addToHistory(client.room, (new Date()).getTime(), msg, 'SERVER');
+		addToHistory(client.room, time, msg, 'SERVER');
 		
 		io.sockets.emit('userdeleted', client.username);
 	});
