@@ -67,40 +67,68 @@ socket.on('room_users', function(rusers, room) {
 
 	room_users = rusers;
 	
-	//console.log(room_users);
-	
 	$('#room-users').empty();
 	$('#room-users').append('<option>Users in room</option>');
 	
 	for(var i in room_users) {
 		$('#room-users').append('<option style="color:' + usercolors[room_users[i]] + ';">' + room_users[i] +  '</option>');
-		
-		var user_video = document.getElementById('ou_' + room_users[i]);
-		
-		if (! user_video) {
-			
-			var container = document.getElementById('remoteVideos');
+	}
 	
+	var container = document.getElementById('remoteVideos');
+	
+	var child_arr = container.childNodes;
+		
+	for(var i = 0; i < child_arr.length; i++) {
+	
+		var vframe = child_arr[i];
+		
+		if(vframe && vframe.className == 'vframe') {
+			
+			console.log(vframe);
+			
+			var hide = 1;
+			
+			for(var j in room_users) {
+			
+				console.log(vframe.childNodes[1].id);
+				
+				if(vframe.childNodes[1].id == 'local_video' || 
+				   vframe.childNodes[1].id == 'ou_' + room_users[j]) { 
+					hide = 0;
+					break;
+				}
+			}
+			
+			if(hide) vframe.style.display = 'none';
+		}
+	}	
+
+	for(var i in room_users) {
+		
+		var userv = document.getElementById('ou_' + room_users[i]);
+		
+		if(! userv) {
+		
 			var vframe = document.createElement('div');
 			vframe.setAttribute('class', 'vframe');	 
 			vframe.id = this.id;
 			
-			var userv = document.createElement('a');
+			userv = document.createElement('a');
 			userv.setAttribute('id', 'ou_' + room_users[i]);
-			userv.setAttribute('onclick', "showUserChat('" + room_users[i] + "', 1)");
 			userv.innerHTML = room_users[i];
 			
-			var video = document.createElement('video');    
-			video.id = 'ou_' + room_users[i];    
+			var video = document.createElement('video');   			   
+			video.setAttribute('id', 'ouv_' + room_users[i]); 
 			video.setAttribute('class', 'remote_video'); 
 			video.setAttribute('poster', '/design/images/qmf.jpg'); 
-
-			remotevid = video;
 
 			vframe.appendChild(video);
 			vframe.appendChild(userv);
 			
 			container.appendChild(vframe);
+		
+		} else {
+			userv.parentNode.style.display = 'block';
 		}
 	}
 });
@@ -111,33 +139,30 @@ socket.on('updaterooms', function(rooms, current_room) {
 	$.each(rooms, function(key, value) {
 		//$('#rooms').append("<a onclick=\"switchRoom('" + value + "')\">" + value + "</a>");
 		
-		console.log(value);
+		//console.log(value);
 		
-		var room = document.getElementById('room_' + value);
-		
-		if (! room) {
+		$('#rooms').empty;
 			
-			var container = document.getElementById('rooms');
-	
-			var vframe = document.createElement('div');
-			vframe.setAttribute('class', 'vframe');	 
-			vframe.id = 'room_' + value;
-			
-			var userv = document.createElement('a');
-			userv.setAttribute('id', 'room_name_' + value);
-			userv.setAttribute('onclick', "switchRoom('" + value + "')");
-			userv.innerHTML = value;
-			
-			var img = document.createElement('img');    
-			img.id = 'room_video_' + value;    
-			img.setAttribute('class', 'remote_video'); 
-			img.setAttribute('src', '/design/images/peep.jpg'); 
+		var container = document.getElementById('rooms');
 
-			vframe.appendChild(img);
-			vframe.appendChild(userv);
-			
-			container.appendChild(vframe);
-		}	
+		var vframe = document.createElement('div');
+		vframe.setAttribute('class', 'vframe');	 
+		vframe.id = 'room_' + value;
+		
+		var userv = document.createElement('a');
+		userv.setAttribute('id', 'room_name_' + value);
+		userv.setAttribute('onclick', "switchRoom('" + value + "')");
+		userv.innerHTML = value;
+		
+		var img = document.createElement('img');    
+		img.id = 'room_video_' + value;    
+		img.setAttribute('class', 'remote_video'); 
+		img.setAttribute('src', '/design/images/peep.jpg'); 
+
+		vframe.appendChild(img);
+		vframe.appendChild(userv);
+		
+		container.appendChild(vframe);	
 		
 		$('#room_name_' + current_room).addClass('curr');	
 	});
@@ -181,6 +206,7 @@ webrtc.on('readyToCall', function () {
 $(function(){
 	
 	$('#outgoingChatMessage').keypress(function(e) {
+	
 		if(e.which == 13) {
 			
 			var obj = {

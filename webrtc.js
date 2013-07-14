@@ -593,15 +593,15 @@ Conversation.prototype.handleRemoteStreamAdded = function (event) {
         }
     }
 	
-	console.log(username);
+	//console.log(username);
 	
 	if(typeof username == 'undefined') return;
 	
 	var stream = this.stream = event.stream;
 	
-	var video = document.getElementById('ou_' + username);
+	var video = document.getElementById('ouv_' + username);
 
-	console.log(video);
+	//console.log(video);
 	
     attachMediaStream(video, stream);
 };
