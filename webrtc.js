@@ -217,7 +217,8 @@ function WebRTC(opts) {
             autoRequestMedia: false,
             // makes the entire PC config overridable
             peerConnectionConfig: {
-                iceServers: browser == 'firefox' ? [{"url":"stun:124.124.124.2"}] : [{"url": "stun:stun.l.google.com:19302"}]
+                //iceServers: browser == 'firefox' ? [{"url":"stun:124.124.124.2"}] : [{"url": "stun:stun.l.google.com:19302"}]
+                iceServers: [{"url": "stun:stun.l.google.com:19302"}]
             },
             peerConnectionContraints: {
                 optional: [{"DtlsSrtpKeyAgreement": true}]
@@ -437,7 +438,7 @@ function Conversation(options) {
     this.initiator = options.initiator;
     // Create an RTCPeerConnection via the polyfill (adapter.js).
     this.pc = new RTCPeerConnection(this.parent.config.peerConnectionConfig, this.parent.config.peerConnectionContraints);
-    this.pc = new RTCPeerConnection(null);
+    //this.pc = new RTCPeerConnection(null);
     this.pc.onicecandidate = this.onIceCandidate.bind(this);
     this.pc.addStream(this.parent.localStream);
     this.pc.onaddstream = this.handleRemoteStreamAdded.bind(this);

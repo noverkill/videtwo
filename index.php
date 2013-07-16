@@ -55,12 +55,18 @@
 				color:#fff;
 				background: transparent url("design/dark/img/bg.png") repeat;	
 			}
-
+			
+			br {
+				line-height: 0;
+				clear: both;
+			}
+			
 			a {
 				text-align: center;
 				margin: 0 0.2em 0 0;
 				color: #eee;
 				text-decoration: none;
+				cursor: pointer;
 			}
 			
 			a:hover {
@@ -71,55 +77,16 @@
 				height:40px;
 				width:150px;
 				background: transparent url("design/images/logos.png") no-repeat;
-			}	
+			}
 			
-			#incomingChatMessages {
-				background-color: #f5f5f5;
-				-webkit-box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);
-				box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);
-				border-radius: 2px;
-				border: solid 1px #ccc;
-				padding: 0.4em;
-				width:300px;
-				min-height:200px;
-				/*overflow:auto;*/
-				margin: 0;
-				font-size: 0.85em;
-				outline: none;
-				font-family: inherit;;
-				box-sizing: border-box;
-				color: #000;
+			#leave {
+				display: none;
 			}
-
-			#outgoingChatMessage {
-				margin-top: 0.3em;
-				width:300px;
-				background-color: #f5f5f5;
-				-webkit-box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);
-				box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);	
-				border-radius: 2px;
-				border: solid 1px #ccc;
-				padding: 0.4em;		
-				font-size: 0.85em;
-				outline: none;
-				font-family: inherit;
-				box-sizing: border-box;	
-				-webkit-appearance: textfield;			
-				-webkit-rtl-ordering: logical;
-				-webkit-user-select: text;
-				cursor: auto;	
-				font: -webkit-small-control;
-				color: initial;
-				letter-spacing: normal;
-				word-spacing: normal;
-				text-transform: none;
-				text-indent: 0px;
-				text-shadow: none;
-				display: inline-block;
-				text-align: start;	
-				-webkit-writing-mode: horizontal-tb;		
+			
+			#remoteVideos {
+				display: none;
 			}
-
+			
 			.remoteVideos {
 				float: left;
 				width: 90%;
@@ -175,7 +142,58 @@
 				background-color: #000;
 				border:1px solid #000;
 			}
-		
+
+			#chat {
+				display: none;
+			}
+			
+			#incomingChatMessages {
+				background-color: #f5f5f5;
+				-webkit-box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);
+				box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);
+				border-radius: 2px;
+				border: solid 1px #ccc;
+				padding: 0.4em;
+				width:300px;
+				min-height:200px;
+				/*overflow:auto;*/
+				margin: 0;
+				font-size: 0.85em;
+				outline: none;
+				font-family: inherit;;
+				box-sizing: border-box;
+				color: #000;
+			}
+
+			#outgoingChatMessage {
+				margin-top: 0.3em;
+				width:300px;
+				background-color: #f5f5f5;
+				-webkit-box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);
+				box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);	
+				border-radius: 2px;
+				border: solid 1px #ccc;
+				padding: 0.4em;		
+				font-size: 0.85em;
+				outline: none;
+				font-family: inherit;
+				box-sizing: border-box;	
+				-webkit-appearance: textfield;			
+				-webkit-rtl-ordering: logical;
+				-webkit-user-select: text;
+				cursor: auto;	
+				font: -webkit-small-control;
+				color: initial;
+				letter-spacing: normal;
+				word-spacing: normal;
+				text-transform: none;
+				text-indent: 0px;
+				text-shadow: none;
+				display: inline-block;
+				text-align: start;	
+				-webkit-writing-mode: horizontal-tb;		
+			}	
+			
 		</style>
 		
 	</head>
@@ -189,7 +207,11 @@
 		<div>Welcome: <?php echo $username; ?></div>
 		
 		<div id="rooms" class="remoteVideos">Loading Rooms</div>
-					
+		
+		<br />
+		
+		<div id="leave"><a onclick="leaveRoom()">Leave room</a></div>
+		
 		<div id="remoteVideos" class="remoteVideos">
 			<div class="vframe" id="local_video_el">
 				<video class="local_video" id="local_video" autoplay="autoplay" muted="muted" poster="/design/images/qmf.jpg"></video>
@@ -203,7 +225,9 @@
 		</div>
 
 	</div>
-
+	
+	<br />
+	
 	<div><a href="?logout">Logout</a></div>
 	
 	<ul id="debug">

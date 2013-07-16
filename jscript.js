@@ -99,7 +99,13 @@ socket.on('room_users', function(rusers, room) {
 				}
 			}
 			
-			if(hide) vframe.style.display = 'none';
+			if(hide) {
+				//console.log(vframe.childNodes);
+				//console.log(vframe.childNodes[1]);
+				//vframe.childNodes[1].pause();
+				vframe.style.display = 'none';
+				//vframe.childNodes[1].src = "";
+			}
 		}
 	}	
 
@@ -135,7 +141,16 @@ socket.on('room_users', function(rusers, room) {
 
 // listener, whenever the server emits 'updaterooms', this updates the room the client is in
 socket.on('updaterooms', function(rooms, current_room) {
+	
+	if(current_room) {
+		$('#rooms').hide();
+		$('#leave').show();
+		$('#remoteVideos').show();
+		$('#chat').show();
+	}
+	
 	$('#rooms').empty();
+	
 	$.each(rooms, function(key, value) {
 		//$('#rooms').append("<a onclick=\"switchRoom('" + value + "')\">" + value + "</a>");
 		
@@ -202,7 +217,16 @@ webrtc.on('readyToCall', function () {
 	
 	webrtc.joinRoom(ROOM_ID, USERNAME);
 });
-					
+
+function leaveRoom () {
+	console.log('leaveRoom');
+	socket.emit('leaveRoom');
+	$('#leave').hide();
+	$('#remoteVideos').hide();
+	$('#chat').hide();
+	$('#rooms').show();
+};
+	
 $(function(){
 	
 	$('#outgoingChatMessage').keypress(function(e) {
