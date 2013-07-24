@@ -65,7 +65,6 @@ if (navigator.mozGetUserMedia) {
     attachMediaStream = function(element, stream) {
 		console.log('attachMediaStream');
 		console.log(element);
-        element.autoplay = true;
         element.src = webkitURL.createObjectURL(stream);
 		element.play();
     };

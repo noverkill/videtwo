@@ -2,12 +2,12 @@
 var yetify = require('yetify'),
     config = require('getconfig'),
     uuid = require('node-uuid'),
-    io = require('socket.io').listen(config.server.port, {log: 1});
+    io = require('socket.io').listen(config.server.port, {log: 0});
 
+var usernames = {};
+var usercolors = {};
 
 var users = [];
-var usernames = []; // it is {} in the new one!!!
-var usercolors = {};
 var history = [];
 
 var colors = [ 'red', 'green', 'blue', 'magenta', 'purple', 'plum', 'orange' ];
@@ -96,46 +96,74 @@ io.sockets.on('connection', function (client) {
         otherClient.emit('message', details);
     });
 	
-	// when the client emits 'adduser', this listens and executes
+	// when the server sends the connect message
+	// the client reply with the adduser message
+	// with the details of the logged in user
+	// (the server send the connect message right after 
+	// the clint call io.connect to this socket server)
 	client.on('adduser', function(username){
 		
 		client.username = username;
-
-		//##client.room = rooms[0];
 
 		usernames[username] = username;
 
 		client.usercolor = colors.shift();		
 		usercolors[username] = client.usercolor;
 		colors.push(client.usercolor);	//push back the color to the end of the list
-				
+		
+		// notify all client with the updated user list (included the new client)
+		console.log('updateusers');
+		console.log(usernames);
+		console.log(usercolors);
 		io.sockets.emit('updateusers', usernames, usercolors);
 		
-		//##client.join(client.room);
-		//##client.emit('updaterooms', rooms, client.room);
-		client.emit('updaterooms', rooms);
+		// send room list to the new client
+		client.emit('roomlist', rooms);
+	});
+	
+	// the client sends this message when:
+	// - a user enter to the room
+	// the server sends back the roomusers message along with the updated list of users
+	// and the roomname
+	client.on('enterRoom', function(newroom){
+		// join new room, received as function parameter
+		client.join(newroom);
+		client.room = newroom;
 		
-		//##var msg = username + ' has entered into ' + client.room;
-		//##var time = (new Date()).getTime();
+		msg = client.username +'  has entered into ' + client.room;
+		time = (new Date()).getTime();
 		
-		//##io.sockets.in(client.room).emit('updatechat', 'SERVER', {'text': msg, 'time': time}, history[client.room]);
-		
-		//##addToHistory(client.room, time, msg, 'SERVER');
+		client.emit('updatechat', 'SERVER', {'text': msg, 'time': time}, history[client.room]);		
+		client.broadcast.to(newroom).emit('updatechat', 'SERVER', {'text': msg, 'time': time});
 
-		//##addRoomUser (client.room, username);
+		addToHistory(client.room, time, msg, 'SERVER');
 		
-		//##io.sockets.in(client.room).emit('room_users', room_users[client.room], client.room);	
+		// update socket session room title
+		// NO!! client.emit('updaterooms', rooms, newroom);
+
+		addRoomUser (client.room, client.username);
+	
+		io.sockets.in(client.room).emit('roomusers', room_users[client.room], client.room);		
 	});
 
-	// when the client emits 'sendchat', this listens and executes
-	client.on('sendchat', function (data) {
+	client.on('leaveRoom', function(newroom){
+	
+		client.leave(client.room);
 
-		// we tell the client to execute 'updatechat' with 2 parameters
-		io.sockets.in(client.room).emit('updatechat', client.username, data);
+		removeRoomUser (client.room, client.username);
+
+		io.sockets.in(client.room).emit('room_users', room_users[client.room], client.room);
 		
-		addToHistory(client.room, data.time, data.text, client.username);
+		// sent message to OLD room
+		var msg = client.username +' has left ' + client.room;	
+		var time = (new Date()).getTime();
+		
+		client.broadcast.to(client.room).emit('updatechat', 'SERVER', {'text': msg, 'time': time});
+		
+		addToHistory(client.room, time, msg, 'SERVER');
 	});
 
+	/*
 	client.on('switchRoom', function(newroom){
 		// leave the current room (stored in session)
 		client.leave(client.room);
@@ -171,43 +199,15 @@ io.sockets.on('connection', function (client) {
 	
 		io.sockets.in(client.room).emit('room_users', room_users[client.room], client.room);		
 	});
+	*/
 	
-	client.on('leaveRoom', function(newroom){
-	
-		client.leave(client.room);
+	// when the client emits 'sendchat', this listens and executes
+	client.on('sendchat', function (data) {
 
-		removeRoomUser (client.room, client.username);
-
-		io.sockets.in(client.room).emit('room_users', room_users[client.room], client.room);
+		// we tell the client to execute 'updatechat' with 2 parameters
+		io.sockets.in(client.room).emit('updatechat', client.username, data);
 		
-		// sent message to OLD room
-		var msg = client.username +' has left ' + client.room;	
-		var time = (new Date()).getTime();
-		
-		client.broadcast.to(client.room).emit('updatechat', 'SERVER', {'text': msg, 'time': time});
-		
-		addToHistory(client.room, time, msg, 'SERVER');
-	});
-
-	client.on('enterRoom', function(newroom){
-		// join new room, received as function parameter
-		client.join(newroom);
-		client.room = newroom;
-		
-		msg = client.username +'  has entered into ' + client.room;
-		time = (new Date()).getTime();
-		
-		client.emit('updatechat', 'SERVER', {'text': msg, 'time': time}, history[client.room]);		
-		client.broadcast.to(newroom).emit('updatechat', 'SERVER', {'text': msg, 'time': time});
-
-		addToHistory(client.room, time, msg, 'SERVER');
-		
-		// update socket session room title
-		client.emit('updaterooms', rooms, newroom);
-
-		addRoomUser (client.room, client.username);
-	
-		io.sockets.in(client.room).emit('room_users', room_users[client.room], client.room);		
+		addToHistory(client.room, data.time, data.text, client.username);
 	});
 	
 	/*

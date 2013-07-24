@@ -38,6 +38,73 @@ socket.on('connect', function(){
 	socket.emit('adduser', USERNAME);
 });
 
+// the server emits 'updateusers' when a new user login or logout,
+// we need to updates the username list on the client side
+socket.on('updateusers', function(unames, ucolors) {
+	
+	console.log('updateusers');
+	console.log(unames);
+	console.log(ucolors);
+	
+	usernames = unames;	
+	usercolors = ucolors;
+	
+	for(var i in usernames) {
+		$('#online-users').append('<option style="color:' + usercolors[i] + ';">' + usernames[i] +  '</option>');
+	}
+});
+
+// the server emits 'roomlist' when:
+// - new user logs in to the site (so the new client need to get the room list)
+// - there's a changing in the list of rooms
+//socket.on('roomlist', function(rooms, NO!! current_room) {
+socket.on('roomlist', function(rooms) {
+	
+	$('#rooms').empty();
+	
+	$.each(rooms, function(key, value) {
+				
+		var container = document.getElementById('rooms');
+
+		var vframe = document.createElement('div');
+		vframe.setAttribute('class', 'vframe');	 
+		vframe.id = 'room_' + value;
+		
+		var userv = document.createElement('a');
+		userv.setAttribute('id', 'room_name_' + value);
+		//NO!!! userv.setAttribute('onclick', "switchRoom('" + value + "')");
+		userv.setAttribute('onclick', "enterRoom('" + value + "')");
+		userv.innerHTML = value;
+		
+		var img = document.createElement('img');    
+		img.id = 'room_video_' + value;    
+		img.setAttribute('class', 'remote_video'); 
+		img.setAttribute('src', '/design/images/peep.jpg'); 
+
+		vframe.appendChild(img);
+		vframe.appendChild(userv);
+		
+		container.appendChild(vframe);	
+		
+		//NO!!! $('#room_name_' + current_room).addClass('curr');	
+	});
+});
+
+/* NO!!!
+function switchRoom(room){
+	socket.emit('switchRoom', room);
+	$('#incomingChatMessages').empty();
+}
+*/
+
+function enterRoom(room){
+	socket.emit('enterRoom', room);
+	$('#rooms').hide();
+	$('#leave').show();
+	$('#remoteVideos').show();
+	$('#chat').show();
+}
+
 socket.on('updatechat', function (username, data, history) {
 	
 	if(history && history.length) {
@@ -53,17 +120,7 @@ socket.on('updatechat', function (username, data, history) {
 	/*if(username != 'SERVER')*/ addToChat(username, data);
 });
 
-// listener, whenever the server emits 'updateusers', this updates the username list
-socket.on('updateusers', function(unames, ucolors) {
-	usernames = unames;	
-	usercolors = ucolors;
-	
-	for(var i in usernames) {
-		$('#online-users').append('<option style="color:' + usercolors[i] + ';">' + usernames[i] +  '</option>');
-	}
-});
-
-socket.on('room_users', function(rusers, room) {
+socket.on('roomusers', function(rusers, room) {
 
 	room_users = rusers;
 	
@@ -138,55 +195,6 @@ socket.on('room_users', function(rusers, room) {
 		}
 	}
 });
-
-// listener, whenever the server emits 'updaterooms', this updates the room the client is in
-socket.on('updaterooms', function(rooms, current_room) {
-	
-	if(current_room) {
-		$('#rooms').hide();
-		$('#leave').show();
-		$('#remoteVideos').show();
-		$('#chat').show();
-	}
-	
-	$('#rooms').empty();
-	
-	$.each(rooms, function(key, value) {
-		//$('#rooms').append("<a onclick=\"switchRoom('" + value + "')\">" + value + "</a>");
-		
-		//console.log(value);
-		
-		$('#rooms').empty;
-			
-		var container = document.getElementById('rooms');
-
-		var vframe = document.createElement('div');
-		vframe.setAttribute('class', 'vframe');	 
-		vframe.id = 'room_' + value;
-		
-		var userv = document.createElement('a');
-		userv.setAttribute('id', 'room_name_' + value);
-		userv.setAttribute('onclick', "switchRoom('" + value + "')");
-		userv.innerHTML = value;
-		
-		var img = document.createElement('img');    
-		img.id = 'room_video_' + value;    
-		img.setAttribute('class', 'remote_video'); 
-		img.setAttribute('src', '/design/images/peep.jpg'); 
-
-		vframe.appendChild(img);
-		vframe.appendChild(userv);
-		
-		container.appendChild(vframe);	
-		
-		$('#room_name_' + current_room).addClass('curr');	
-	});
-});
-
-function switchRoom(room){
-	socket.emit('switchRoom', room);
-	$('#incomingChatMessages').empty();
-}
 
 function addToChat(username, data) {
 	
